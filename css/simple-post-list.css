@@ -1,0 +1,12 @@
+.simple-post-list {
+  font-size: 12px;
+}
+
+.simple-post-list input[type=text], .simple-post-list select {
+  width: 100%;
+}
+
+.simple-post-list small {
+  font-size: 9px;
+  color: #777;
+}
