@@ -11,7 +11,8 @@
     <label for="<?php echo $this->get_field_name('selection'); ?>"><?php echo __('Select list:'); ?></label><br>
     <select name="<?php echo $this->get_field_name('selection'); ?>" id="<?php echo $this->get_field_id('selection'); ?>">
       <option value=""> [Please make your selection] </option>
-      <option value="most_comment" <?php echo ('most_comment' == $instance['selection']) ? 'selected' : '' ?>>Most commented</option>
+      <!-- loop this -->
+      <option value="most_commented" <?php echo ('most_commented' == $instance['selection']) ? 'selected' : '' ?>>Most commented</option>
       <option value="recent_comment" <?php echo ('recent_comment' == $instance['selection']) ? 'selected' : '' ?>>Recent comments</option>
       <option value="recent_update" <?php echo ('recent_update' == $instance['selection']) ? 'selected' : '' ?>>Recent updates</option>
     </select>
@@ -41,7 +42,7 @@
     <label for="<?php echo $this->get_field_name('thumbnail_size'); ?>"><?php echo __('Select thumbnail size:'); ?></label><br>
     <select name="<?php echo $this->get_field_name('thumbnail_size'); ?>" id="<?php echo $this->get_field_id('thumbnail_size'); ?>">
     <?php include_once('db_queries.php');
-      foreach(spp_get_thumbnail_sizes() as $name => $desc) : ?>
+      foreach(spl_get_thumbnail_sizes() as $name => $desc) : ?>
         <option <?php echo ($name == $instance['thumbnail_size']) ? 'selected' : '' ?> value="<?php echo $name; ?>">
           <?php echo $desc; ?>
         </option>

@@ -1,5 +1,4 @@
 <?php
-error_log(var_export($post, TRUE));
 $output = $args['before_widget'].$args['before_title'];
 
 // Use custom title or post title

@@ -37,7 +37,9 @@ class simple_post_list extends WP_Widget {
 
       include_once('includes/db_queries.php');
       if(!empty($selection)) {
-        $data = spl_get_posts($selection, (int)$limit);
+        $limit = !is_int($limit) ? (int)$limit : $limit;
+        $limit = $limit == 0 ? 1 : $limit;
+        $data = spl_get_posts($selection, $limit);
         foreach($data as $post) {
           //Print to view
           include('includes/view.php');
