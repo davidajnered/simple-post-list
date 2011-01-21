@@ -1,44 +1,32 @@
-<?php
-$output = $args['before_widget'].$args['before_title'];
+<?php print $args['before_widget']; ?>
 
-// Use custom title or post title
-if($title != NULL) {
-  $output .= $title;
-}
+<?php if($title != NULL) {
+  print $args['before_title'] . $title . $args['after_title'];
+} ?>
 
-$output .= '<h3>' . $post->post_title . '</h3>';
+<?php $id = 0; foreach($data as $post) : ?>
+  <li class="simple-post-list-post" id="simple-post-list-id-<?php print $id; ?>">
+    <h3><?php print $post->post_title; ?></h3>
+    <?php if($thumbnail == TRUE) : ?>
+      <a href="<?php print $url; ?>"><?php print get_the_post_thumbnail($post->ID, $thumbnail_size); ?></a>
+    <?php endif; ?>
 
-$output .= $args['after_title'];
+    <?php
+      $content = ($data_to_use == 'excerpt') ? strip_tags($post->post_excerpt) : strip_tags($post->post_content);
+      // Show the specified length of the content
+      if($length <= -1) {
+        $content = '';
+      } else if (strlen($content) > $length) {
+        if($length > 0) {
+          $content = substr($content, 0, $length) . '&hellip; ';
+        }
+      }
+    ?>
+    <p>
+      <?php print $content; ?>
+      <a href="<?php print get_bloginfo('url') . '?p=' . $post->ID; ?>"><?php print $link; ?></a>
+    </p>
+  </li>
+<?php $id++; endforeach; ?>
 
-// Show thumbnail
-if($thumbnail == TRUE) {
-  $output .= '<a href="' . $url . '">';
-  $output .= get_the_post_thumbnail($post->ID, $thumbnail_size);
-  $output .= '</a>';
-}
-
-// Use post content or post excerpt
-if($data_to_use == 'excerpt') {
-  $content = strip_tags($post->post_excerpt);
-} else {
-  $content = strip_tags($post->post_content);
-}
-
-// Show the specified length of the content
-if($length <= -1) {
-  $content = '';
-} else if (strlen($content) > $length) {
-  if($length > 0) {
-    $content = substr($content, 0, $length) . '&hellip; ';
-  }
-}
-
-$url = get_bloginfo('url');
-$url .= '?p='.$post->ID;
-$html_link = '<a href="' . $url . '">' . $link . '</a>';
-
-// Link to post of category
-$output .= '<p>' . $content . ' ' . $html_link . '</p>' . $args['after_widget'];
-
-// Print
-echo $output;
+<?php print $args['after_widget']; ?>

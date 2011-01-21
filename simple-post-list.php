@@ -40,10 +40,8 @@ class simple_post_list extends WP_Widget {
         $limit = !is_int($limit) ? (int)$limit : $limit;
         $limit = $limit == 0 ? 1 : $limit;
         $data = spl_get_posts($selection, $limit);
-        foreach($data as $post) {
-          //Print to view
-          include('includes/view.php');
-        }
+        //Print to view
+        include('includes/view.php');
       } else {
         if(!$data) {
           $title = "Simple Post List";
