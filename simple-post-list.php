@@ -8,7 +8,7 @@
  */
 
 class simple_post_list extends WP_Widget {
-
+  
   /**
   * Init method
   */
@@ -36,12 +36,20 @@ class simple_post_list extends WP_Widget {
       $link = $instance['link'];
 
       include_once('includes/db_queries.php');
-      if(!empty($selection)) {
+      if(!empty($selection) && strpos($selection, 'post:') !== FALSE) {
+        $selection = str_replace('post:', '', $selection);
         $limit = !is_int($limit) ? (int)$limit : $limit;
         $limit = $limit == 0 ? 1 : $limit;
         $data = spl_get_posts($selection, $limit);
         //Print to view
-        include('includes/view.php');
+        include('includes/view-posts.php');
+      } else if(!empty($selection) && strpos($selection, 'comment:') !== FALSE) {
+        $selection = str_replace('comment:', '', $selection);
+        $limit = !is_int($limit) ? (int)$limit : $limit;
+        $limit = $limit == 0 ? 1 : $limit;
+        $data = spl_get_posts($selection, $limit);
+        //Print to view
+        include('includes/view-comments.php');
       } else {
         if(!$data) {
           $title = "Simple Post List";

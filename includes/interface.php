@@ -11,10 +11,16 @@
     <label for="<?php echo $this->get_field_name('selection'); ?>"><?php echo __('Select list:'); ?></label><br>
     <select name="<?php echo $this->get_field_name('selection'); ?>" id="<?php echo $this->get_field_id('selection'); ?>">
       <option value=""> [Please make your selection] </option>
-      <!-- loop this -->
-      <option value="most_commented" <?php echo ('most_commented' == $instance['selection']) ? 'selected' : '' ?>>Most commented</option>
-      <option value="recent_comment" <?php echo ('recent_comment' == $instance['selection']) ? 'selected' : '' ?>>Recent comments</option>
-      <option value="recent_update" <?php echo ('recent_update' == $instance['selection']) ? 'selected' : '' ?>>Recent updates</option>
+      <?php $options = array(
+        array('type' => 'post', 'value' => 'most_commented_post', 'name' => 'Most commented posts'),
+        array('type' => 'post', 'value' => 'recent_commented_post', 'name' => 'Recent commented posts'),
+        array('type' => 'post', 'value' => 'recent_updated_post', 'name' => 'Recent updated posts'),
+        array('type' => 'comment', 'value' => 'recent_comments', 'name' => 'Recent comments'),
+      );
+      foreach($options as $option) : ?>
+        <?php $value = $option['type'] . ':' . $option['value']; ?>
+        <option value="<?php print $value; ?>" <?php echo ($value == $instance['selection']) ? 'selected' : ''; ?>><?php print $option['name']; ?></option>
+      <?php endforeach; ?>
     </select>
   </p>
 

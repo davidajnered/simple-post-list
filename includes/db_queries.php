@@ -1,10 +1,10 @@
 <?php
 
-function spl_get_posts($type = 'recent_update', $limit = 1) {
+function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
   global $wpdb;
   switch($type) {
 
-    case 'recent_comment':
+    case 'recent_commented_post':
       $query =
         "SELECT ID, post_title, post_content, post_excerpt, post_date, post_status, guid, term_id, count(comment_post_ID) as nbr_comments, max(comment_date) as comment_date
          FROM {$wpdb->posts}
@@ -23,7 +23,7 @@ function spl_get_posts($type = 'recent_update', $limit = 1) {
       $data = $wpdb->get_results($query);
       break;
 
-    case 'most_commented':
+    case 'most_commented_post':
       $query =
         "SELECT ID, post_title, post_content, post_excerpt, post_date, post_status, guid, term_id, comment_count, comment_date
          FROM {$wpdb->posts}
@@ -42,7 +42,7 @@ function spl_get_posts($type = 'recent_update', $limit = 1) {
       $data = $wpdb->get_results($query);
       break;
 
-    case 'recent_update':
+    case 'recent_updated_post':
       $query = 
         "SELECT ID, post_title, post_content, post_excerpt, max(post_date), post_status, guid, term_id, count(comment_post_ID) as nbr_comments, comment_date
          FROM {$wpdb->posts}
@@ -59,6 +59,23 @@ function spl_get_posts($type = 'recent_update', $limit = 1) {
          LIMIT $limit;";
       $data = $wpdb->get_results($query);
       break;
+      
+    case 'recent_comments':
+      // Fixa!!!!!!!!!!!!!!!!!!!!!!!!!!! ---------------------------- ____________________________
+      $query = 
+        "SELECT * FROM {$wpdb->comments} AS c
+         LEFT JOIN {$wpdb->users} AS u ON c.comment_author = u.user_login
+         LEFT JOIN {$wpdb->posts} AS p ON c.comment_post_ID = p.ID
+         WHERE c.comment_approved = 1
+         ORDER BY c.comment_date DESC
+         LIMIT $limit;";
+      $data = $wpdb->get_results($query);
+      break;
+      
+    default:
+      $data = array('', '');
+      break;
+
   }
   return $data;
 }

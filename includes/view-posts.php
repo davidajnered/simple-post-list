@@ -7,7 +7,7 @@
 <ol>
   <?php $id = 0; foreach($data as $post) : ?>
     <li class="simple-post-list-post" id="simple-post-list-id-<?php print $id; ?>">
-      <h3><?php print $post->post_title; ?></h3>
+      <h4><?php print $post->post_title; ?></h4>
       <?php if($thumbnail == TRUE) : ?>
         <a href="<?php print $url; ?>"><?php print get_the_post_thumbnail($post->ID, $thumbnail_size); ?></a>
       <?php endif; ?>
