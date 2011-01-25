@@ -1,6 +1,7 @@
 <?php
 
 function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
+  error_log(var_export($type, TRUE));
   global $wpdb;
   switch($type) {
 
@@ -52,7 +53,7 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
       $query = 
         "SELECT * FROM {$wpdb->comments} AS c
          LEFT JOIN ({$wpdb->users} AS u, {$wpdb->posts} AS p) 
-         ON (c.comment_author = u.user_login, c.comment_post_ID = p.ID)
+         ON (c.comment_author = u.user_login AND c.comment_post_ID = p.ID)
          WHERE c.comment_approved = 1
          ORDER BY c.comment_date DESC
          LIMIT $limit;";
@@ -78,7 +79,7 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
           "SELECT $post_table.ID, post_title, post_content, post_excerpt, post_date, post_status, guid, term_id, count(comment_post_ID) as nbr_comments, comment_date, display_name AS author
            FROM $post_table
            LEFT JOIN ($term_relation_table, $term_tax_table, $comments_table, $user_table)
-           ON (object_id = ID AND $term_tax_table.term_taxonomy_id = $term_tax_table.term_taxonomy_id AND comment_post_ID = ID, post_author = $user_table.ID)
+           ON (object_id = $post_table.ID AND $term_tax_table.term_taxonomy_id = $term_tax_table.term_taxonomy_id AND comment_post_ID = $post_table.ID AND post_author = $user_table.ID)
            WHERE post_type = 'post'
            AND post_status = 'publish'
            GROUP BY ID
@@ -101,6 +102,7 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
       break;
 
   }
+  error_log(var_export($data, TRUE));
   return $data;
 }
 
