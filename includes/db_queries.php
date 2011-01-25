@@ -104,12 +104,14 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
            ORDER BY post_date DESC
            LIMIT $limit;";
         $post_data = $wpdb->get_results($query);
-
-        // Specify a query of add the fields you want to grab to the array in sanitize_option_data function call
         $query = "SELECT * FROM $option_table WHERE option_name = 'blogname';";
-        $blog_data = sanitize_option_data($wpdb->get_results($query), array('blogname'));
-        $post_data[0]->blogname = $blog_data['blogname'];
-        $data[] = $post_data[0];
+        $blog_options = $wpdb->get_results($query);
+        foreach($post_data as $posts) {
+          // Specify a query of add the fields you want to grab to the array in sanitize_option_data function call
+          $blog_data = sanitize_option_data($blog_options, array('blogname'));
+          $posts->blogname = $blog_data['blogname'];
+          $data[] = $posts;
+        }
       }
       break;
 

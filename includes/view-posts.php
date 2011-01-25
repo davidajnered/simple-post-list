@@ -9,7 +9,7 @@
     <li class="simple-post-list-post" id="simple-post-list-id-<?php print $id; ?>">
       <h4><?php print $post->post_title; ?></h4>
       <?php if($thumbnail == TRUE) : ?>
-        <a href="<?php print $url; ?>"><?php print get_the_post_thumbnail($post->ID, $thumbnail_size); ?></a>
+        <a href="<?php print $post->guid; ?>"><?php print get_the_post_thumbnail($post->ID, $thumbnail_size); ?></a>
       <?php endif; ?>
 
       <?php
@@ -25,7 +25,7 @@
       ?>
       <p>
         <?php print $content; ?>
-        <a href="<?php print get_bloginfo('url') . '?p=' . $post->ID; ?>"><?php print $link; ?></a>
+        <a href="<?php print $post->guid ?>"><?php print $link; ?></a>
       </p>
     </li>
   <?php $id++; endforeach; ?>
