@@ -6,7 +6,6 @@
 
 <ol>
   <?php $id = 0; foreach($data as $comment) : ?>
-    <?php error_log(var_export($data, TRUE));?>
     <li class="simple-post-list-comment" id="simple-post-list-id-<?php print $id; ?>">
       <?php if(!empty($comment->comment_author_url)) : ?>
         <span class="spl-comment-author"><a href="<?php print $comment->comment_author_url; ?>"><?php print $comment->comment_author; ?></a></span>

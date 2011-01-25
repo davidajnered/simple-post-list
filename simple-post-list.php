@@ -35,22 +35,30 @@ class simple_post_list extends WP_Widget {
       $data_to_use = $instance['data_to_use'];
       $link = $instance['link'];
 
+      $limit = !is_int($limit) ? (int)$limit : $limit;
+      $limit = $limit == 0 ? 1 : $limit;
+
       include_once('includes/db_queries.php');
+      // Post
       if(!empty($selection) && strpos($selection, 'post:') !== FALSE) {
         $selection = str_replace('post:', '', $selection);
-        $limit = !is_int($limit) ? (int)$limit : $limit;
-        $limit = $limit == 0 ? 1 : $limit;
         $data = spl_get_posts($selection, $limit);
-        //Print to view
         include('includes/view-posts.php');
-      } else if(!empty($selection) && strpos($selection, 'comment:') !== FALSE) {
+      }
+      // Comment
+      else if(!empty($selection) && strpos($selection, 'comment:') !== FALSE) {
         $selection = str_replace('comment:', '', $selection);
-        $limit = !is_int($limit) ? (int)$limit : $limit;
-        $limit = $limit == 0 ? 1 : $limit;
         $data = spl_get_posts($selection, $limit);
-        //Print to view
         include('includes/view-comments.php');
-      } else {
+      }
+      // Blog
+      else if(!empty($selection) && strpos($selection, 'blog:') !== FALSE) {
+        $selection = str_replace('blog:', '', $selection);
+        $data = spl_get_posts($selection, $limit);
+        include('includes/view-blogs.php');
+      }
+      // Fallback
+      else {
         if(!$data) {
           $title = "Simple Post List";
           $length = 100;

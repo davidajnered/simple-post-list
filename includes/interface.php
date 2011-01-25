@@ -7,17 +7,20 @@
     <small>If empty the posts title will be used</small>
   </p>
 
+  <?php
+  $options[] = array('type' => 'post', 'value' => 'most_commented_post', 'name' => 'Most commented posts');
+  $options[] = array('type' => 'post', 'value' => 'recent_commented_post', 'name' => 'Recent commented posts');
+  $options[] = array('type' => 'post', 'value' => 'recent_updated_post', 'name' => 'Recent updated posts');
+  $options[] = array('type' => 'comment', 'value' => 'recent_comments', 'name' => 'Recent comments');
+  if(WP_ALLOW_MULTISITE == TRUE) {
+    $options[] = array('type' => 'blog', 'value' => 'recent_post_from_other_blogs', 'name' => 'Recent posts from other blogs');
+  } ?>
+
   <p>
     <label for="<?php echo $this->get_field_name('selection'); ?>"><?php echo __('Select list:'); ?></label><br>
     <select name="<?php echo $this->get_field_name('selection'); ?>" id="<?php echo $this->get_field_id('selection'); ?>">
       <option value=""> [Please make your selection] </option>
-      <?php $options = array(
-        array('type' => 'post', 'value' => 'most_commented_post', 'name' => 'Most commented posts'),
-        array('type' => 'post', 'value' => 'recent_commented_post', 'name' => 'Recent commented posts'),
-        array('type' => 'post', 'value' => 'recent_updated_post', 'name' => 'Recent updated posts'),
-        array('type' => 'comment', 'value' => 'recent_comments', 'name' => 'Recent comments'),
-      );
-      foreach($options as $option) : ?>
+      <?php foreach($options as $option) : ?>
         <?php $value = $option['type'] . ':' . $option['value']; ?>
         <option value="<?php print $value; ?>" <?php echo ($value == $instance['selection']) ? 'selected' : ''; ?>><?php print $option['name']; ?></option>
       <?php endforeach; ?>
