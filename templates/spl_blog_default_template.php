@@ -1,3 +1,16 @@
+<?php
+/**
+ *
+ * Style Name: Default Blog Template
+ * Class: Simple Post List
+ * Description: The default template used to display blog posts
+ * Author: David Ajnered
+ * Version: 1.0
+ * Author URI: http://davidajnered.com/
+ *
+ */
+?>
+
 <?php print $args['before_widget']; ?>
 
 <?php if($title != NULL) {
@@ -6,10 +19,9 @@
 
 <ol>
   <?php $id = 0; foreach($data as $post) : ?>
-    <?php error_log(var_export($post, TRUE));?>
     <li class="simple-post-list simple-post-list-blog blog-<?php print strtolower(str_replace(' ', '-', $post->blogname)); ?>" id="simple-post-list-id-<?php print $id; ?>">
       <h4><?php print $post->post_title; ?></h4>
-      <?php if($thumbnail == TRUE) : ?>
+      <?php if($has_thumbnail == TRUE) : ?>
         <a href="<?php print $post->guid; ?>"><?php print get_the_post_thumbnail($post->ID, $thumbnail_size); ?></a>
       <?php endif; ?>
 

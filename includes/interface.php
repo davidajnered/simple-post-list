@@ -40,26 +40,26 @@
     excerpt
   </p>
 
-  <div class="spp-thumbnail">
-  <div class="spp-thumbnail-wrapper">
-  <p>
-    <input id="<?php echo $this->get_field_id('thumbnail') ?>" class="spp_thumbnail_checkbox" name="<?php echo $this->get_field_name('thumbnail'); ?>" type="checkbox" value="checked" <?php echo $thumbnail ? 'checked': ''; ?>>
-    Show thumbnail in push
-  </p>
+  <div class="spl-thumbnail">
+    <div class="spl-thumbnail-wrapper">
+      <p>
+        <input id="<?php echo $this->get_field_id('has_thumbnail') ?>" class="spl-thumbnail-checkbox" name="<?php echo $this->get_field_name('has_thumbnail'); ?>" type="checkbox" value="checked" <?php echo $has_thumbnail ? 'checked': ''; ?>>
+        Show thumbnail in push
+      </p>
 
-  <p class="spp_thumbnail_dropdown_wrapper">
-    <label for="<?php echo $this->get_field_name('thumbnail_size'); ?>"><?php echo __('Select thumbnail size:'); ?></label><br>
-    <select name="<?php echo $this->get_field_name('thumbnail_size'); ?>" id="<?php echo $this->get_field_id('thumbnail_size'); ?>">
-    <?php include_once('db_queries.php');
-      foreach(spl_get_thumbnail_sizes() as $name => $desc) : ?>
-        <option <?php echo ($name == $instance['thumbnail_size']) ? 'selected' : '' ?> value="<?php echo $name; ?>">
-          <?php echo $desc; ?>
-        </option>
-      <?php endforeach; ?>
-    </select>
-  </p>
+      <p class="spl-thumbnail-dropdown-wrapper">
+        <label for="<?php echo $this->get_field_name('thumbnail_size'); ?>"><?php echo __('Select thumbnail size:'); ?></label><br>
+        <select name="<?php echo $this->get_field_name('thumbnail_size'); ?>" id="<?php echo $this->get_field_id('thumbnail_size'); ?>">
+        <?php include_once('db_queries.php');
+          foreach(spl_get_thumbnail_sizes() as $name => $desc) : ?>
+            <option <?php echo ($name == $instance['thumbnail_size']) ? 'selected' : '' ?> value="<?php echo $name; ?>">
+              <?php echo $desc; ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </p>
+    </div>
   </div>
-</div>
 
   <p>
     <label for="<?php echo $this->get_field_name('length'); ?>"><?php echo __('Length in characters:'); ?></label><br>
@@ -70,4 +70,19 @@
     <label for="<?php echo $this->get_field_name('link'); ?>"><?php echo __('Link title:'); ?></label><br>
     <input id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name('link'); ?>" type="text" value="<?php echo $link; ?>" />
   </p>
+
+  <?php if($template_files) : ?>
+    <p class="spl-template">
+      <label for="<?php echo $this->get_field_name('template'); ?>"><?php echo __('Select template:'); ?></label><br>
+      <select name="<?php echo $this->get_field_name('template'); ?>" id="<?php echo $this->get_field_id('template'); ?>">
+        <option value=""> [Please select a template] </option>
+        <?php foreach($template_files as $template) : ?>
+          <option <?php echo ($template['Path'] == $instance['template']) ? 'selected' : '' ?> value="<?php echo $template['Path']; ?>">
+            <?php echo $template['Name']; ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </p>
+  <?php endif; ?>
+
 </div>

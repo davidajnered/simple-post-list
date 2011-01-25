@@ -1,3 +1,16 @@
+<?php
+/**
+ *
+ * Style Name: Default Comment Template
+ * Class: Simple Post List
+ * Description: The default template used to display comments
+ * Author: David Ajnered
+ * Version: 1.0
+ * Author URI: http://davidajnered.com/
+ *
+ */
+?>
+
 <?php print $args['before_widget']; ?>
 
 <?php if($title != NULL) {

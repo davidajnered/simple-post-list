@@ -5,11 +5,11 @@ jQuery(document).ready(function() {
 
   initCheckbox();
 
-  jQuery('.spp_thumbnail_checkbox').live('click', function() {
+  jQuery('.spl-thumbnail-checkbox').live('click', function() {
     if(jQuery(this).is(':checked')) {
-      jQuery(this).parentsUntil('.spp-thumbnail').find('.spp_thumbnail_dropdown_wrapper').show();
+      jQuery(this).parentsUntil('.spl-thumbnail').find('.spl-thumbnail-dropdown-wrapper').slideDown(100);
     } else {
-      jQuery(this).parentsUntil('.spp-thumbnail').find('.spp_thumbnail_dropdown_wrapper').hide();
+      jQuery(this).parentsUntil('.spl-thumbnail').find('.spl-thumbnail-dropdown-wrapper').slideUp(100);
     }
   });
 
@@ -20,11 +20,11 @@ jQuery(document).ajaxSuccess(function() {
 });
 
 function initCheckbox() {
-  jQuery('.spp_thumbnail_checkbox').each(function(key, object) {
+  jQuery('.spl-thumbnail-checkbox').each(function(key, object) {
     if(jQuery(object).is(':checked')) {
-      jQuery(object).parentsUntil('.spp-thumbnail').find('.spp_thumbnail_dropdown_wrapper').show();
+      jQuery(object).parentsUntil('.spl-thumbnail').find('.spl-thumbnail-dropdown-wrapper').show();
     } else {
-      jQuery(object).parentsUntil('.spp-thumbnail').find('.spp_thumbnail_dropdown_wrapper').hide();
+      jQuery(object).parentsUntil('.spl-thumbnail').find('.spl-thumbnail-dropdown-wrapper').hide();
     }
   });
 }

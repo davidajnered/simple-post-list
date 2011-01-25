@@ -6,14 +6,10 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
 
     case 'recent_commented_post':
       $query =
-        "SELECT ID, post_title, post_content, post_excerpt, post_date, post_status, guid, term_id, count(comment_post_ID) as nbr_comments, max(comment_date) as comment_date
+        "SELECT ID, post_title AS title, post_content AS content, post_excerpt AS excerpt, post_date AS date, post_status, guid AS url, term_id, count(comment_post_ID) as comments, max(comment_date) as comment_date
          FROM {$wpdb->posts}
-         LEFT JOIN {$wpdb->term_relationships}
-         ON object_id = ID
-         LEFT JOIN {$wpdb->term_taxonomy}
-         ON {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id
-         LEFT JOIN {$wpdb->comments}
-         ON comment_post_ID = ID
+         LEFT JOIN ({$wpdb->term_relationships}, {$wpdb->term_taxonomy}, {$wpdb->comments})
+         ON (object_id = ID AND {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id AND comment_post_ID = ID)
          WHERE post_type = 'post'
          AND post_status = 'publish'
          AND comment_approved = 1
@@ -27,12 +23,8 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
       $query =
         "SELECT ID, post_title, post_content, post_excerpt, post_date, post_status, guid, term_id, comment_count, comment_date
          FROM {$wpdb->posts}
-         LEFT JOIN {$wpdb->term_relationships}
-         ON object_id = ID
-         LEFT JOIN {$wpdb->term_taxonomy}
-         ON {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id
-         LEFT JOIN {$wpdb->comments}
-         ON comment_post_ID = ID
+         LEFT JOIN ({$wpdb->term_relationships}, {$wpdb->term_taxonomy}, {$wpdb->comments})
+         ON (object_id = ID AND {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id AND comment_post_ID = ID)
          WHERE post_type = 'post'
          AND post_status = 'publish'
          AND comment_approved = 1
@@ -44,14 +36,10 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
 
     case 'recent_updated_post':
       $query = 
-        "SELECT ID, post_title, post_content, post_excerpt, max(post_date), post_status, guid, term_id, count(comment_post_ID) as nbr_comments, comment_date
+        "SELECT ID, post_title AS title, post_content AS content, post_excerpt AS excerpt, post_date AS date, post_status, guid AS url, term_id, count(comment_post_ID) as comments, comment_date
          FROM {$wpdb->posts}
-         LEFT JOIN {$wpdb->term_relationships}
-         ON object_id = ID
-         LEFT JOIN {$wpdb->term_taxonomy}
-         ON {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id
-         LEFT JOIN {$wpdb->comments}
-         ON comment_post_ID = ID
+         LEFT JOIN ({$wpdb->term_relationships}, {$wpdb->term_taxonomy}, {$wpdb->comments})
+         ON (object_id = ID AND {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id AND comment_post_ID = ID)
          WHERE post_type = 'post'
          AND post_status = 'publish'
          GROUP BY ID
@@ -61,11 +49,10 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
       break;
       
     case 'recent_comments':
-      // Fixa!!!!!!!!!!!!!!!!!!!!!!!!!!! ---------------------------- ____________________________
       $query = 
         "SELECT * FROM {$wpdb->comments} AS c
-         LEFT JOIN {$wpdb->users} AS u ON c.comment_author = u.user_login
-         LEFT JOIN {$wpdb->posts} AS p ON c.comment_post_ID = p.ID
+         LEFT JOIN ({$wpdb->users} AS u, {$wpdb->posts} AS p) 
+         ON (c.comment_author = u.user_login, c.comment_post_ID = p.ID)
          WHERE c.comment_approved = 1
          ORDER BY c.comment_date DESC
          LIMIT $limit;";
@@ -90,14 +77,8 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
         $query =
           "SELECT $post_table.ID, post_title, post_content, post_excerpt, post_date, post_status, guid, term_id, count(comment_post_ID) as nbr_comments, comment_date, display_name AS author
            FROM $post_table
-           LEFT JOIN $term_relation_table
-           ON object_id = ID
-           LEFT JOIN $term_tax_table
-           ON $term_tax_table.term_taxonomy_id = $term_tax_table.term_taxonomy_id
-           LEFT JOIN $comments_table
-           ON comment_post_ID = ID
-           LEFT JOIN $user_table
-           ON post_author = $user_table.ID
+           LEFT JOIN ($term_relation_table, $term_tax_table, $comments_table, $user_table)
+           ON (object_id = ID AND $term_tax_table.term_taxonomy_id = $term_tax_table.term_taxonomy_id AND comment_post_ID = ID, post_author = $user_table.ID)
            WHERE post_type = 'post'
            AND post_status = 'publish'
            GROUP BY ID

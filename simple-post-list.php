@@ -8,12 +8,12 @@
  */
 
 class simple_post_list extends WP_Widget {
-  
+
   /**
   * Init method
   */
-  function simple_post_list(){
-    $widget_ops = array('classname' => 'simple_post_list',
+  function simple_post_list() {
+		$widget_ops = array('classname' => 'simple_post_list',
                         'description' => __("Create a list with posts"));
 
     $control_ops = array('width' => 100, 'height' => 100);
@@ -26,66 +26,114 @@ class simple_post_list extends WP_Widget {
   function widget($args, $instance) {
     if(!empty($instance)) {
       // Variables
-      $title = $instance['title'];
-      $length = (int)$instance['length'];
-      $selection = $instance['selection'];
-      $limit = $instance['limit'];
-      $thumbnail = $instance['thumbnail'];
-      $thumbnail_size = $instance['thumbnail_size'];
-      $data_to_use = $instance['data_to_use'];
-      $link = $instance['link'];
-
+      $title                = $instance['title'];
+      $length               = (int)$instance['length'];
+      $selection            = $instance['selection'];
+      $has_thumbnail        = $instance['has_thumbnail'];
+      $thumbnail_size       = $instance['thumbnail_size'];
+      $data_to_use          = $instance['data_to_use'];
+      $link                 = $instance['link'];
+      $template             = $instance['template'];
+      $limit                = $instance['limit'];
+      // Set default limit
       $limit = !is_int($limit) ? (int)$limit : $limit;
       $limit = $limit == 0 ? 1 : $limit;
 
       include_once('includes/db_queries.php');
-      // Post
-      if(!empty($selection) && strpos($selection, 'post:') !== FALSE) {
-        $selection = str_replace('post:', '', $selection);
+      if(!empty($selection)) {
+        $ex = explode(':', $selection);
+        $type = $ex[0];
+        $selection = $ex[1];
         $data = spl_get_posts($selection, $limit);
-        include('includes/view-posts.php');
+        $inc = $template ? $template : WP_PLUGIN_DIR . '/simple-post-list/' . 'templates/spl_' . $type . '_default_template.php';
       }
-      // Comment
-      else if(!empty($selection) && strpos($selection, 'comment:') !== FALSE) {
-        $selection = str_replace('comment:', '', $selection);
-        $data = spl_get_posts($selection, $limit);
-        include('includes/view-comments.php');
-      }
-      // Blog
-      else if(!empty($selection) && strpos($selection, 'blog:') !== FALSE) {
-        $selection = str_replace('blog:', '', $selection);
-        $data = spl_get_posts($selection, $limit);
-        include('includes/view-blogs.php');
-      }
-      // Fallback
-      else {
-        if(!$data) {
-          $title = "Simple Post List";
-          $length = 100;
-          $data = (object)array(
-            'post_title' => 'Error!',
-            'post_content' => 'This widget needs configuration',
-          );
+      include_once('includes/output.php');
+    }
+  }
+
+  /**
+   *
+   */
+  function spl_get_themes() {
+    $path = WP_CONTENT_DIR . '/themes/' . get_template();
+    $template_files = array();
+  	if(is_dir($path)) {
+  	  if ($folder = opendir($path)) {
+        while(($file = readdir($folder)) !== FALSE) {
+          if(strpos($file, 'spl_post_') !== FALSE ||
+            strpos($file, 'spl_comment_') !== FALSE ||
+            strpos($file, 'spl_blog_') !== FALSE) {
+            $file_path = $path . '/' . $file;
+            $template = $this->spl_fetch_template($file_path);
+            $template['Path'] = $file_path;
+            if(!empty($template['Path']) && !empty($template['Name'])) {
+              $template_files[] = $template;
+            }
+          }
         }
       }
     }
+  	return $template_files;
+  }
+
+  /**
+   *
+   */
+  function spl_fetch_template($file = NULL) {
+  	$default_headers = array(
+  		'Name'          => 'Style Name',
+  		'Class'         => 'Class',
+  		'Description'   => 'Description',
+  		'Version'       => 'Version',
+  		'Author'        => 'Author',
+  		'AuthorURI'     => 'Author URI',
+  	);
+  	$fp = fopen($file, 'r');
+  	$file_data = fread($fp, 8192);
+  	fclose($fp);
+  	
+  	foreach($default_headers as $field => $regex) {
+  		preg_match('/^[ \t\/*#]*' . preg_quote($regex, '/') . ':(.*)$/mi', $file_data, ${$field});
+  		if (!empty(${$field})) {
+  			${$field} = _cleanup_header_comment(${$field}[1]);
+  		} else {
+  			${$field} = '';
+			}
+  	}
+  	$file_data = compact(array_keys($default_headers));
+  	return $file_data;
+  }
+
+  /**
+   *
+   */
+  function spl_shorten($content, $length) {
+    if($length <= -1) {
+      $content = '';
+    }
+    else if (strlen($content) > $length) {
+      if($length > 0) {
+        $content = substr($content, 0, $length) . '&hellip; ';
+      }
+    }
+    return $content;
   }
 
  /**
   * Saves the widget settings
   */
   function update($new_instance, $old_instance) {
-    $thumb = strip_tags(stripslashes($new_instance['thumbnail']));
     $instance = $old_instance;
-    $instance['title'] = strip_tags(stripslashes($new_instance['title']));
-    $instance['selection'] = strip_tags(stripslashes($new_instance['selection']));
-    $instance['limit'] = strip_tags(stripslashes($new_instance['limit']));
-    $instance['thumbnail'] = $thumb != 'checked' ? FALSE : TRUE;
+    $instance['title']          = strip_tags(stripslashes($new_instance['title']));
+    $instance['selection']      = strip_tags(stripslashes($new_instance['selection']));
+    $instance['limit']          = strip_tags(stripslashes($new_instance['limit']));
+    $instance['has_thumbnail']  = strip_tags(stripslashes($new_instance['has_thumbnail'])) != 'checked' ? FALSE : TRUE;
     $instance['thumbnail_size'] = strip_tags(stripslashes($new_instance['thumbnail_size']));
-    $instance['data_to_use'] = strip_tags(stripslashes($new_instance['data_to_use']));
-    $instance['length'] = strip_tags(stripslashes($new_instance['length']));
-    $instance['link'] = strip_tags(stripslashes($new_instance['link']));
-    $instance['link_to'] = strip_tags(stripslashes($new_instance['link_to']));
+    $instance['data_to_use']    = strip_tags(stripslashes($new_instance['data_to_use']));
+    $instance['length']         = strip_tags(stripslashes($new_instance['length']));
+    $instance['link']           = strip_tags(stripslashes($new_instance['link']));
+    $instance['link_to']        = strip_tags(stripslashes($new_instance['link_to']));
+    $instance['template']       = strip_tags(stripslashes($new_instance['template']));
     return $instance;
   }
 
@@ -93,16 +141,17 @@ class simple_post_list extends WP_Widget {
   * GUI for backend
   */
   function form($instance) {
-    $title = htmlspecialchars($instance['title']);
-    $selection = htmlspecialchars($instance['selection']);
-    $limit = htmlspecialchars($instance['limit']);
-    $thumbnail = htmlspecialchars($instance['thumbnail']);
+    $title          = htmlspecialchars($instance['title']);
+    $selection      = htmlspecialchars($instance['selection']);
+    $limit          = htmlspecialchars($instance['limit']);
+    $has_thumbnail  = htmlspecialchars($instance['has_thumbnail']);
     $thumbnail_size = htmlspecialchars($instance['thumbnail_size']);
-    $data_to_use = htmlspecialchars($instance['data_to_use']);
-    $length = htmlspecialchars($instance['length']);
-    $link = htmlspecialchars($instance['link']);
-    $link_to = htmlspecialchars($instance['link_to']);
+    $data_to_use    = htmlspecialchars($instance['data_to_use']);
+    $length         = htmlspecialchars($instance['length']);
+    $link           = htmlspecialchars($instance['link']);
+    $link_to        = htmlspecialchars($instance['link_to']);
 
+    $template_files = $this->spl_get_themes();
     /* Print interface */
     include('includes/interface.php');
   }
