@@ -9,38 +9,39 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
 
     // Post
     case 'recent_commented_post':
-      $query = get_common_query('post') . "
-         WHERE post_type = 'post'
+      $query = get_common_query('post') . "WHERE post_type = 'post'
          AND post_status = 'publish'
          AND comment_approved = 1
          GROUP BY ID
          ORDER BY comment_date DESC
          LIMIT $limit;";
       $data = $wpdb->get_results($query);
+      foreach($data AS $post) {
+      }
       break;
 
     // Post
     case 'most_commented_post':
-      $query = get_common_query('post') . "
-         WHERE post_type = 'post'
-         AND post_status = 'publish'
-         AND comment_approved = 1
-         GROUP BY ID
-         ORDER BY comment_count DESC
-         LIMIT $limit;";
+      $query = get_common_query('post') . "WHERE post_type = 'post'
+        AND post_status = 'publish'
+        AND comment_approved = 1
+        GROUP BY ID
+        ORDER BY comment_count DESC
+        LIMIT $limit;";
       $data = $wpdb->get_results($query);
+      foreach($data AS $post) {
+        $tags = spl_get_tags($post->id);
+      }
       break;
 
     // Post
     case 'recent_updated_post':
-      $query = 
-        $query = get_common_query('post') .
-         "WHERE post_type = 'post'
-         AND post_status = 'publish'
-         GROUP BY ID
-         ORDER BY post_date DESC
-         LIMIT $limit;";
+      $query = get_common_query('post') . "WHERE post_type = 'post' AND post_status = 'publish' GROUP BY ID ORDER BY post_date DESC LIMIT $limit;";
       $data = $wpdb->get_results($query);
+      foreach($data AS $post) {
+        $tags = spl_get_tags($post->id);
+        $post->tags = $tags;
+      }
       break;
 
     // Comments
@@ -114,23 +115,63 @@ function get_common_query($type) {
   switch($type) {
 
     case 'post':
-      $select = "SELECT ID AS id, post_title AS title, post_content AS content, post_excerpt AS except, post_date AS date, post_status, guid AS post_url, term_id, comment_count AS comments, comment_date AS comment_date
-      FROM {$wpdb->posts}
-      LEFT JOIN ({$wpdb->term_relationships}, {$wpdb->term_taxonomy}, {$wpdb->comments})
-      ON (object_id = id AND {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id AND comment_post_ID = id) ";
+      $select =
+        "SELECT p.ID AS id,
+          post_title AS title,
+          post_content AS content,
+          post_excerpt AS except,
+          post_date AS date,
+          post_status,
+          guid AS post_url,
+          comment_count AS comments,
+          comment_date AS comment_date,
+          display_name AS author
+        FROM {$wpdb->posts} AS p
+        LEFT JOIN ({$wpdb->term_relationships} AS tr, {$wpdb->term_taxonomy} AS tt, {$wpdb->comments} AS c, {$wpdb->users} AS u)
+        ON (
+          tr.object_id = p.id 
+          AND tr.term_taxonomy_id = tt.term_taxonomy_id
+          AND c.comment_post_ID = p.id
+          AND p.post_author = u.ID
+        ) "; // Leave whitespace
       break;
 
     case 'comment':
-      $select = "SELECT comment_ID AS id, comment_post_ID AS post_id, comment_date as date, comment_content AS content, comment_author AS author, comment_author_url AS author_url, comment_author_email AS author_email, guid AS post_url, post_title, post_date
-      FROM {$wpdb->comments} AS c
-      LEFT JOIN ({$wpdb->users} AS u, {$wpdb->posts} AS p)
-      ON (c.comment_author = u.user_login AND c.comment_post_ID = p.ID) ";
+      $select =
+        "SELECT comment_ID AS id,
+          comment_post_ID AS post_id,
+          comment_date as date,
+          comment_content AS content,
+          comment_author AS author,
+          comment_author_url AS author_url,
+          comment_author_email AS author_email,
+          guid AS post_url,
+          post_title,
+          post_date
+        FROM {$wpdb->comments} AS c
+        LEFT JOIN ({$wpdb->users} AS u, {$wpdb->posts} AS p)
+        ON (c.comment_author = u.user_login AND c.comment_post_ID = p.ID) ";
       break;
 
     case 'blog':
       break;
   }
   return $select;
+}
+
+function spl_get_tags($id) {
+  global $wpdb;
+  $query =
+   "SELECT t.name FROM {$wpdb->term_relationships} AS tr
+    LEFT JOIN ({$wpdb->terms} AS t, {$wpdb->term_taxonomy} AS tt)
+    ON (tr.term_taxonomy_id = t.term_id AND tt.term_taxonomy_id = tr.term_taxonomy_id)
+    WHERE object_id = 4
+    AND tt.taxonomy = 'post_tag'";
+  $tags_array = $wpdb->get_results($query);
+  foreach($tags_array as $tag) {
+    $tags[] = $tag->name;
+  }
+  return $tags;
 }
 
 /**
