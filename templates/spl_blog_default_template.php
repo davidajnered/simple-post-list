@@ -32,6 +32,6 @@
 <?php endif; ?>
 
   <p>
-    <?php print $this->spl_shorten($content, $length); ?>
+    <?php print $content; ?>
     <a href="<?php print $guid ?>"><?php print $link; ?></a>
   </p>

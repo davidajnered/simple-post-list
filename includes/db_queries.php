@@ -17,6 +17,8 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
          LIMIT $limit;";
       $data = $wpdb->get_results($query);
       foreach($data AS $post) {
+        $tags = spl_get_tags($post->id);
+        $post->tags = $tags;
       }
       break;
 
@@ -31,6 +33,7 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
       $data = $wpdb->get_results($query);
       foreach($data AS $post) {
         $tags = spl_get_tags($post->id);
+        $post->tags = $tags;
       }
       break;
 
@@ -71,7 +74,7 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
         $user_table = $main_blog_prefix . 'users';
 
         $query =
-          "SELECT $post_table.ID AS id, post_title AS title, post_content AS content, post_excerpt AS excerpt, post_date AS date, post_status, guid AS url, term_id, count(comment_post_ID) as comments, comment_date AS comment_date, display_name AS author
+          "SELECT $post_table.ID AS id, post_title AS title, post_content AS content, post_excerpt AS excerpt, post_date AS date, post_status, guid AS post_url, term_id, count(comment_post_ID) as comments, comment_date AS comment_date, display_name AS author
            FROM $post_table
            LEFT JOIN ($term_relation_table, $term_tax_table, $comments_table, $user_table)
            ON (object_id = $post_table.ID AND $term_tax_table.term_taxonomy_id = $term_tax_table.term_taxonomy_id AND comment_post_ID = $post_table.ID AND post_author = $user_table.ID)
@@ -120,8 +123,6 @@ function get_common_query($type) {
           post_title AS title,
           post_content AS content,
           post_excerpt AS except,
-          post_date AS date,
-          post_status,
           guid AS post_url,
           comment_count AS comments,
           comment_date AS comment_date,
@@ -165,7 +166,7 @@ function spl_get_tags($id) {
    "SELECT t.name FROM {$wpdb->term_relationships} AS tr
     LEFT JOIN ({$wpdb->terms} AS t, {$wpdb->term_taxonomy} AS tt)
     ON (tr.term_taxonomy_id = t.term_id AND tt.term_taxonomy_id = tr.term_taxonomy_id)
-    WHERE object_id = 4
+    WHERE object_id = $id
     AND tt.taxonomy = 'post_tag'";
   $tags_array = $wpdb->get_results($query);
   foreach($tags_array as $tag) {

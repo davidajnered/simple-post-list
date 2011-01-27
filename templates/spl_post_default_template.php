@@ -12,10 +12,11 @@
  * $id
  * $title
  * $content
- * $date
+ * $post_date
  * $post_status
- * $url
- * $term_id
+ * $post_url
+ * $author
+ * $tags - array with tags
  * $comments
  * $comment_date
  * $has_thumbnail
@@ -23,12 +24,25 @@
  */
 ?>
 
-<h3><?php print $title; ?></h3>
+<h3><a href="<?php print $post_url; ?>"><?php print $title; ?></a></h3>
 <?php if($has_thumbnail == TRUE) : ?>
-  <a href="<?php print $guid; ?>"><?php print get_the_post_thumbnail($ID, $thumbnail_size); ?></a>
+  <a href="<?php print $post_url; ?>"><?php print get_the_post_thumbnail($id, $thumbnail); ?></a>
 <?php endif; ?>
-<p>
+
+<div class="content">
   <?php print $content; ?>
-  <a href="<?php print $url ?>"><?php print $link; ?></a>
-</p>
+</div>
+
+<div class="post-meta">
+  <div class="tags">
+    <?php foreach($tags as $tag) : ?>
+      <span class="tag"><?php print $tag; ?></span>
+    <?php endforeach; ?>
+  </div>
+
+  <div class="comment"><?php print $comments; ?></div>
+  <div class="comment"><?php print $comment_date; ?></div>
+  <div class="author"><?php print $author; ?></div>
+  <a href="<?php print $post_url; ?>"><?php print $link; ?></a>
+</div>
       
