@@ -8,6 +8,21 @@
  * Version: 1.0
  * Author URI: http://davidajnered.com/
  *
+ * Template variables:
+ * $id
+ * $title
+ * $content
+ * $excerpt
+ * $date
+ * $post_status
+ * $url
+ * $term_id
+ * $comments
+ * $comment_date
+ * $author
+ * $blogname
+ * $has_thumbnail
+ * $thumbnail
  */
 ?>
 
@@ -20,5 +35,3 @@
     <?php print $this->spl_shorten($content, $length); ?>
     <a href="<?php print $guid ?>"><?php print $link; ?></a>
   </p>
-      
-; ?>

@@ -8,6 +8,7 @@
  */
 
 class simple_post_list extends WP_Widget {
+  private $length;
 
   /**
   * Init method
@@ -26,8 +27,8 @@ class simple_post_list extends WP_Widget {
   function widget($args, $instance) {
     if(!empty($instance)) {
       // Variables
-      $title                = $instance['title'];
-      $length               = (int)$instance['length'];
+      $widget_title         = $instance['widget_title'];
+      $this->length         = (int)$instance['length'];
       $selection            = $instance['selection'];
       $has_thumbnail        = $instance['has_thumbnail'];
       $thumbnail_size       = $instance['thumbnail_size'];
@@ -44,10 +45,10 @@ class simple_post_list extends WP_Widget {
         $ex = explode(':', $selection);
         $type = $ex[0];
         $selection = $ex[1];
-        $data = spl_get_posts($selection, $limit);
+        $data_array = spl_get_posts($selection, $limit);
         $inc = $template ? $template : WP_PLUGIN_DIR . '/simple-post-list/' . 'templates/spl_' . $type . '_default_template.php';
       }
-      include_once('includes/output.php');
+      include('includes/output.php');
     }
   }
 
@@ -107,13 +108,13 @@ class simple_post_list extends WP_Widget {
   /**
    *
    */
-  function spl_shorten($content, $length) {
-    if($length <= -1) {
+  function spl_shorten($content) {
+    if($this->length <= -1) {
       $content = '';
     }
-    else if (strlen($content) > $length) {
-      if($length > 0) {
-        $content = substr($content, 0, $length) . '&hellip; ';
+    else if (strlen($content) > $this->length) {
+      if($this->length > 0) {
+        $content = substr($content, 0, $this->length) . '&hellip; ';
       }
     }
     return $content;
@@ -124,7 +125,7 @@ class simple_post_list extends WP_Widget {
   */
   function update($new_instance, $old_instance) {
     $instance = $old_instance;
-    $instance['title']          = strip_tags(stripslashes($new_instance['title']));
+    $instance['widget_title']   = strip_tags(stripslashes($new_instance['widget_title']));
     $instance['selection']      = strip_tags(stripslashes($new_instance['selection']));
     $instance['limit']          = strip_tags(stripslashes($new_instance['limit']));
     $instance['has_thumbnail']  = strip_tags(stripslashes($new_instance['has_thumbnail'])) != 'checked' ? FALSE : TRUE;
@@ -141,7 +142,7 @@ class simple_post_list extends WP_Widget {
   * GUI for backend
   */
   function form($instance) {
-    $title          = htmlspecialchars($instance['title']);
+    $widget_title   = htmlspecialchars($instance['widget_title']);
     $selection      = htmlspecialchars($instance['selection']);
     $limit          = htmlspecialchars($instance['limit']);
     $has_thumbnail  = htmlspecialchars($instance['has_thumbnail']);

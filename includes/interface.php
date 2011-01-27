@@ -2,18 +2,17 @@
 
 <div class="simple-post-list">
   <p>
-    <label for="<?php echo $this->get_field_name('title'); ?>"><?php echo __('Title:') ?></label><br>
-    <input id="<?php echo $this->get_field_id('title') ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo $title; ?>"/>
-    <small>If empty the posts title will be used</small>
+    <label for="<?php echo $this->get_field_name('widget_title'); ?>"><?php echo __('Title:') ?></label><br>
+    <input id="<?php echo $this->get_field_id('widget_title') ?>" name="<?php echo $this->get_field_name('widget_title'); ?>" type="text" value="<?php echo $widget_title; ?>"/>
   </p>
 
   <?php
-  $options[] = array('type' => 'post', 'value' => 'most_commented_post', 'name' => 'Most commented posts');
-  $options[] = array('type' => 'post', 'value' => 'recent_commented_post', 'name' => 'Recent commented posts');
-  $options[] = array('type' => 'post', 'value' => 'recent_updated_post', 'name' => 'Recent updated posts');
-  $options[] = array('type' => 'comment', 'value' => 'recent_comments', 'name' => 'Recent comments');
+  $options[] = array('type' => 'post', 'value' => 'most_commented_post', 'name' => 'Post: Most commented');
+  $options[] = array('type' => 'post', 'value' => 'recent_commented_post', 'name' => 'Post: Latest commented');
+  $options[] = array('type' => 'post', 'value' => 'recent_updated_post', 'name' => 'Post: Latest updated');
+  $options[] = array('type' => 'comment', 'value' => 'recent_comments', 'name' => 'Comment: Latest comments');
   if(WP_ALLOW_MULTISITE == TRUE) {
-    $options[] = array('type' => 'blog', 'value' => 'recent_post_from_other_blogs', 'name' => 'Recent posts from other blogs');
+    $options[] = array('type' => 'blog', 'value' => 'recent_post_from_other_blogs', 'name' => 'Blog: Last posts from site');
   } ?>
 
   <p>
@@ -64,6 +63,7 @@
   <p>
     <label for="<?php echo $this->get_field_name('length'); ?>"><?php echo __('Length in characters:'); ?></label><br>
     <input id="<?php echo $this->get_field_id('length'); ?>" name="<?php echo $this->get_field_name('length'); ?>" type="text" value="<?php echo $length; ?>" />
+    <small>&nbsp;0=show all and -1=show none</small>
   </p>
 
   <p>
@@ -75,7 +75,7 @@
     <p class="spl-template">
       <label for="<?php echo $this->get_field_name('template'); ?>"><?php echo __('Select template:'); ?></label><br>
       <select name="<?php echo $this->get_field_name('template'); ?>" id="<?php echo $this->get_field_id('template'); ?>">
-        <option value=""> [Please select a template] </option>
+        <option value=""> [Use default template] </option>
         <?php foreach($template_files as $template) : ?>
           <option <?php echo ($template['Path'] == $instance['template']) ? 'selected' : '' ?> value="<?php echo $template['Path']; ?>">
             <?php echo $template['Name']; ?>

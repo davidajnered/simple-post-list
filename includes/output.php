@@ -1,15 +1,18 @@
 <?php $old_variables = array(); ?>
 <?php print $args['before_widget']; ?>
-  <?php print ($title != NULL) ? $args['before_title'] . $title . $args['after_title'] : ''; ?>
+  <?php print ($widget_title != NULL) ? $args['before_title'] . $widget_title . $args['after_title'] : ''; ?>
   <ol>
     <?php
       $id = 0;
-      foreach($data as $post) :
+      foreach($data_array as $data) :
         // We want to use the simplest variable names possible,
         // and to make sure they doesn't conflict with other variables,
         // we store old ones so we can restore them after the loop 
-        foreach($post as $key => $value) {
+        foreach($data as $key => $value) {
           $old_variables[$key] = ${$key};
+          if($key == 'content' || $key == 'excerpt') {
+            $value = $this->spl_shorten($value);
+          }
           ${$key} = $value;
         }
       ?>
@@ -20,7 +23,6 @@
 
       <?php
         // Restore the old variable values
-        //error_log(var_export($old_variables, TRUE));
         foreach($old_variables as $key => $value) {
           ${$key} = $value;
         }
