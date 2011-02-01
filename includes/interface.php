@@ -31,14 +31,6 @@
     <input id="<?php echo $this->get_field_id('limit') ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo $limit; ?>"/>
   </p>
 
-  <p>
-    Use:
-    <input id="<?php echo $this->get_field_id('data_to_use'); ?>" name="<?php echo $this->get_field_name('data_to_use'); ?>" type="radio" value="content" <?php echo $data_to_use == 'content' ? 'checked': ''; ?> />
-    content
-    <input id="<?php echo $this->get_field_id('data_to_use'); ?>" name="<?php echo $this->get_field_name('data_to_use'); ?>" type="radio" value="excerpt" <?php echo $data_to_use == 'excerpt' ? 'checked': ''; ?> />
-    excerpt
-  </p>
-
   <div class="spl-thumbnail">
     <div class="spl-thumbnail-wrapper">
       <p>
@@ -50,15 +42,28 @@
         <label for="<?php echo $this->get_field_name('thumbnail_size'); ?>"><?php echo __('Select thumbnail size:'); ?></label><br>
         <select name="<?php echo $this->get_field_name('thumbnail_size'); ?>" id="<?php echo $this->get_field_id('thumbnail_size'); ?>">
         <?php include_once('db_queries.php');
+        if(spl_get_thumbnail_sizes() != NULL) :
           foreach(spl_get_thumbnail_sizes() as $name => $desc) : ?>
             <option <?php echo ($name == $instance['thumbnail_size']) ? 'selected' : '' ?> value="<?php echo $name; ?>">
               <?php echo $desc; ?>
             </option>
           <?php endforeach; ?>
+        <?php else : ?>
+          <option> [You need to upload an image] </option>
+        <?php endif; ?>
         </select>
       </p>
     </div>
   </div>
+
+  <p>
+    <input id="<?php echo $this->get_field_id('data_to_use'); ?>" name="<?php echo $this->get_field_name('data_to_use'); ?>" type="radio" value="content" <?php echo $data_to_use == 'content' ? 'checked': ''; ?> />
+    content
+    <input id="<?php echo $this->get_field_id('data_to_use'); ?>" name="<?php echo $this->get_field_name('data_to_use'); ?>" type="radio" value="excerpt" <?php echo $data_to_use == 'excerpt' ? 'checked': ''; ?> />
+    excerpt
+    <input id="<?php echo $this->get_field_id('paragraph'); ?>" name="<?php echo $this->get_field_name('paragraph'); ?>" type="checkbox" value="checked" <?php echo $paragraph == TRUE ? 'checked': ''; ?> />
+    paragraph
+  </p>
 
   <p>
     <label for="<?php echo $this->get_field_name('length'); ?>"><?php echo __('Length in characters:'); ?></label><br>

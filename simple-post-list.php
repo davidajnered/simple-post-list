@@ -33,6 +33,7 @@ class simple_post_list extends WP_Widget {
       $has_thumbnail        = $instance['has_thumbnail'];
       $thumbnail_size       = $instance['thumbnail_size'];
       $data_to_use          = $instance['data_to_use'];
+      $paragraph            = $instance['paragraph'];
       $link                 = $instance['link'];
       $template             = $instance['template'];
       $limit                = $instance['limit'];
@@ -56,7 +57,7 @@ class simple_post_list extends WP_Widget {
    *
    */
   function spl_get_themes() {
-    $path = WP_CONTENT_DIR . '/themes/' . get_template();
+    $path = ABSPATH . '/wp-content/themes/' . get_template();
     $template_files = array();
   	if(is_dir($path)) {
   	  if ($folder = opendir($path)) {
@@ -121,6 +122,16 @@ class simple_post_list extends WP_Widget {
   }
 
  /**
+  *
+  */
+  function spl_paragraph($content) {
+    $start = strpos($content, '<p>');
+    $end = strpos($content, '</p>', $start);
+    $paragraph = substr($content, $start, $end - $start + 4);
+    return $paragraph;
+  }
+
+ /**
   * Saves the widget settings
   */
   function update($new_instance, $old_instance) {
@@ -131,6 +142,7 @@ class simple_post_list extends WP_Widget {
     $instance['has_thumbnail']  = strip_tags(stripslashes($new_instance['has_thumbnail'])) != 'checked' ? FALSE : TRUE;
     $instance['thumbnail_size'] = strip_tags(stripslashes($new_instance['thumbnail_size']));
     $instance['data_to_use']    = strip_tags(stripslashes($new_instance['data_to_use']));
+    $instance['paragraph']      = strip_tags(stripslashes($new_instance['paragraph'])) != 'checked' ? FALSE : TRUE;
     $instance['length']         = strip_tags(stripslashes($new_instance['length']));
     $instance['link']           = strip_tags(stripslashes($new_instance['link']));
     $instance['link_to']        = strip_tags(stripslashes($new_instance['link_to']));
@@ -148,6 +160,7 @@ class simple_post_list extends WP_Widget {
     $has_thumbnail  = htmlspecialchars($instance['has_thumbnail']);
     $thumbnail_size = htmlspecialchars($instance['thumbnail_size']);
     $data_to_use    = htmlspecialchars($instance['data_to_use']);
+    $paragraph      = htmlspecialchars($instance['paragraph']);
     $length         = htmlspecialchars($instance['length']);
     $link           = htmlspecialchars($instance['link']);
     $link_to        = htmlspecialchars($instance['link_to']);

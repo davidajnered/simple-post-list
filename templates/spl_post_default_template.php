@@ -26,7 +26,7 @@
 
 <h3><a href="<?php print $post_url; ?>"><?php print $title; ?></a></h3>
 <?php if($has_thumbnail == TRUE) : ?>
-  <a href="<?php print $post_url; ?>"><?php print get_the_post_thumbnail($id, $thumbnail); ?></a>
+  <a href="<?php print $post_url; ?>"><?php print get_the_post_thumbnail($id, $thumbnail_size); ?></a>
 <?php endif; ?>
 
 <div class="content">
