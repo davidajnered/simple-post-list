@@ -61,7 +61,7 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
       $wpdb_stash = clone $wpdb;
       foreach(spl_get_all_blogs() as $blog) {
         $wpdb->blogid = $blog;
-        $wpdb->set_prefix( $wpdb->base_prefix );
+        $wpdb->set_prefix($wpdb->base_prefix);
         $post_data = $wpdb->get_results($wpdb->prepare(
           "SELECT {$wpdb->posts}.ID AS id, post_title AS title, post_content AS content, post_excerpt AS excerpt, post_date AS date, post_status, guid AS post_url, term_id, count(comment_post_ID) as comments, comment_date AS comment_date, display_name AS author
            FROM {$wpdb->posts}
@@ -116,9 +116,20 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
 
 function spl_get_all_blogs() {
   global $wpdb;
-  $query = "SELECT blog_id FROM $wpdb->blogs;";
-  foreach($wpdb->get_results($query) as $key => $value) {
-    $blogs[] = $value->blog_id;
+  $wpdb_stash = clone $wpdb;
+  $blog_ids = $wpdb->get_results("SELECT blog_id FROM $wpdb->blogs;");
+  foreach($blog_ids as $key => $value) {
+    $wpdb->blogid = $value->blog_id;
+    $wpdb->set_prefix($wpdb->base_prefix);
+    $blog_data = $wpdb->get_results($wpdb->prepare(
+    "SELECT * FROM $wpdb->options WHERE option_name = 'blogname';"
+    ));
+    $blog_data = sanitize_option_data($blog_data, array('blogname'));
+    $blogs[] = array(
+      "id" => $value->blog_id,
+      "name" => $blog_data['blogname'],
+    );
+    $wpdb = clone $wpdb_stash;
   }
   return $blogs;
 }
@@ -211,7 +222,7 @@ function spl_get_thumbnail_sizes() {
   $options = array();
   $wpdb_stash = clone $wpdb;
   foreach(spl_get_all_blogs() as $blog) {
-    $wpdb->blogid = $blog;
+    $wpdb->blogid = $blog->id;
     $wpdb->set_prefix( $wpdb->base_prefix );
     $data = $wpdb->get_results($wpdb->prepare(
       "SELECT meta_value FROM {$wpdb->postmeta}
@@ -230,6 +241,6 @@ function spl_get_thumbnail_sizes() {
       }
     }
   }
-  
+  $wpdb = clone $wpdb_stash;
   return $options;
 }

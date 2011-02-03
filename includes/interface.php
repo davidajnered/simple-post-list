@@ -7,21 +7,32 @@
   </p>
 
   <?php
-  $options[] = array('type' => 'post', 'value' => 'most_commented_post', 'name' => 'Post: Most commented');
-  $options[] = array('type' => 'post', 'value' => 'recent_commented_post', 'name' => 'Post: Latest commented');
-  $options[] = array('type' => 'post', 'value' => 'recent_updated_post', 'name' => 'Post: Latest updated');
-  $options[] = array('type' => 'comment', 'value' => 'recent_comments', 'name' => 'Comment: Latest comments');
-  if(WP_ALLOW_MULTISITE == TRUE) {
-    $options[] = array('type' => 'blog', 'value' => 'recent_post_from_other_blogs', 'name' => 'Blog: Last posts from site');
-  } ?>
-
+    foreach(spl_get_all_blogs() as $blog) {
+      $options[$blog['id']]['blogname'] = $blog['name'];
+      $options[$blog['id']]['option'][] = array('type' => 'post', 'value'    => 'recent_updated_post', 'name'    => 'Post: Latest');
+      $options[$blog['id']]['option'][] = array('type' => 'post', 'value'    => 'most_commented_post', 'name'    => 'Post: Most commented');
+      $options[$blog['id']]['option'][] = array('type' => 'post', 'value'    => 'recent_commented_post', 'name'  => 'Post: Latest commented');
+      $options[$blog['id']]['option'][] = array('type' => 'comment', 'value' => 'recent_comments', 'name'        => 'Comment: Latest comments');
+    }
+    if(WP_ALLOW_MULTISITE == TRUE) {
+      $options['general']['blogname'] = 'General';
+      $options['general']['option'][] = array('type' => 'blog', 'value' => 'recent_post_from_other_blogs', 'name' => 'Blog: Latest posts from all blogs');
+    }
+  ?>
   <p>
     <label for="<?php echo $this->get_field_name('selection'); ?>"><?php echo __('Select list:'); ?></label><br>
     <select name="<?php echo $this->get_field_name('selection'); ?>" id="<?php echo $this->get_field_id('selection'); ?>">
       <option value=""> [Please make your selection] </option>
-      <?php foreach($options as $option) : ?>
-        <?php $value = $option['type'] . ':' . $option['value']; ?>
-        <option value="<?php print $value; ?>" <?php echo ($value == $instance['selection']) ? 'selected' : ''; ?>><?php print $option['name']; ?></option>
+      <?php foreach($options as $blog) : ?>
+        <?php error_log(var_export($blog, TRUE));?>
+        <option><?php print $blog['blogname']; ?></option>
+        <?php foreach($blog['option'] as $data) : ?>
+          
+          <?php $value = $data['type'] . ':' . $data['value']; ?>
+          <option value="<?php print $value; ?>" <?php echo ($value == $instance['selection']) ? 'selected' : ''; ?>>
+            - <?php print $data['name']; ?>
+          </option>
+        <?php endforeach; ?>
       <?php endforeach; ?>
     </select>
   </p>
