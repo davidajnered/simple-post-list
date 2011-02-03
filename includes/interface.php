@@ -26,9 +26,30 @@
     </select>
   </p>
 
+  <p class="spl-limit">
+    <label for="<?php echo $this->get_field_name('limit'); ?>"><?php echo __('Number of posts:') ?></label><br>
+    <input class="spl-limit-input" id="<?php echo $this->get_field_id('limit') ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo $limit; ?>"/>
+
+    <span class="spl-limit-per-post">
+      <input id="<?php echo $this->get_field_id('posts_per_blog') ?>" class="spl-limit-checkbox" name="<?php echo $this->get_field_name('posts_per_blog'); ?>" type="checkbox" value="checked" <?php echo $posts_per_blog ? 'checked': ''; ?>>
+      Posts per blog
+    </span>
+
+  </p>
+
   <p>
-    <label for="<?php echo $this->get_field_name('limit'); ?>"><?php echo __('Number of posts in the list:') ?></label><br>
-    <input id="<?php echo $this->get_field_id('limit') ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo $limit; ?>"/>
+    <input id="<?php echo $this->get_field_id('data_to_use'); ?>" name="<?php echo $this->get_field_name('data_to_use'); ?>" type="radio" value="content" <?php echo $data_to_use == 'content' ? 'checked': ''; ?> />
+    content
+    <input id="<?php echo $this->get_field_id('data_to_use'); ?>" name="<?php echo $this->get_field_name('data_to_use'); ?>" type="radio" value="excerpt" <?php echo $data_to_use == 'excerpt' ? 'checked': ''; ?> />
+    excerpt
+    <input id="<?php echo $this->get_field_id('paragraph'); ?>" name="<?php echo $this->get_field_name('paragraph'); ?>" type="checkbox" value="checked" <?php echo $paragraph == TRUE ? 'checked': ''; ?> />
+    paragraph
+  </p>
+
+  <p>
+    <label for="<?php echo $this->get_field_name('length'); ?>"><?php echo __('Length in characters:'); ?></label><br>
+    <input id="<?php echo $this->get_field_id('length'); ?>" name="<?php echo $this->get_field_name('length'); ?>" type="text" value="<?php echo $length; ?>" />
+    <small>&nbsp;0=show all and -1=show none</small>
   </p>
 
   <div class="spl-thumbnail">
@@ -55,26 +76,6 @@
       </p>
     </div>
   </div>
-
-  <p>
-    <input id="<?php echo $this->get_field_id('data_to_use'); ?>" name="<?php echo $this->get_field_name('data_to_use'); ?>" type="radio" value="content" <?php echo $data_to_use == 'content' ? 'checked': ''; ?> />
-    content
-    <input id="<?php echo $this->get_field_id('data_to_use'); ?>" name="<?php echo $this->get_field_name('data_to_use'); ?>" type="radio" value="excerpt" <?php echo $data_to_use == 'excerpt' ? 'checked': ''; ?> />
-    excerpt
-    <input id="<?php echo $this->get_field_id('paragraph'); ?>" name="<?php echo $this->get_field_name('paragraph'); ?>" type="checkbox" value="checked" <?php echo $paragraph == TRUE ? 'checked': ''; ?> />
-    paragraph
-  </p>
-
-  <p>
-    <label for="<?php echo $this->get_field_name('length'); ?>"><?php echo __('Length in characters:'); ?></label><br>
-    <input id="<?php echo $this->get_field_id('length'); ?>" name="<?php echo $this->get_field_name('length'); ?>" type="text" value="<?php echo $length; ?>" />
-    <small>&nbsp;0=show all and -1=show none</small>
-  </p>
-
-  <p>
-    <label for="<?php echo $this->get_field_name('link'); ?>"><?php echo __('Link title:'); ?></label><br>
-    <input id="<?php echo $this->get_field_id('link'); ?>" name="<?php echo $this->get_field_name('link'); ?>" type="text" value="<?php echo $link; ?>" />
-  </p>
 
   <?php if($template_files) : ?>
     <p class="spl-template">

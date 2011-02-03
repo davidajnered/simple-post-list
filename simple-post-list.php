@@ -34,6 +34,7 @@ class simple_post_list extends WP_Widget {
       $thumbnail_size       = $instance['thumbnail_size'];
       $data_to_use          = $instance['data_to_use'];
       $paragraph            = $instance['paragraph'];
+      $posts_per_blog       = $instance['posts_per_blog'];
       $link                 = $instance['link'];
       $template             = $instance['template'];
       $limit                = $instance['limit'];
@@ -46,7 +47,7 @@ class simple_post_list extends WP_Widget {
         $ex = explode(':', $selection);
         $type = $ex[0];
         $selection = $ex[1];
-        $data_array = spl_get_posts($selection, $limit);
+        $data_array = spl_get_posts($selection, $limit, $posts_per_blog);
         $inc = $template ? $template : WP_PLUGIN_DIR . '/simple-post-list/' . 'templates/spl_' . $type . '_default_template.php';
       }
       include('includes/output.php');
@@ -146,6 +147,7 @@ class simple_post_list extends WP_Widget {
     $instance['thumbnail_size'] = strip_tags(stripslashes($new_instance['thumbnail_size']));
     $instance['data_to_use']    = strip_tags(stripslashes($new_instance['data_to_use']));
     $instance['paragraph']      = strip_tags(stripslashes($new_instance['paragraph'])) != 'checked' ? FALSE : TRUE;
+    $instance['posts_per_blog'] = strip_tags(stripslashes($new_instance['posts_per_blog'])) != 'checked' ? FALSE : TRUE;
     $instance['length']         = strip_tags(stripslashes($new_instance['length']));
     $instance['link']           = strip_tags(stripslashes($new_instance['link']));
     $instance['link_to']        = strip_tags(stripslashes($new_instance['link_to']));
@@ -164,6 +166,7 @@ class simple_post_list extends WP_Widget {
     $thumbnail_size = htmlspecialchars($instance['thumbnail_size']);
     $data_to_use    = htmlspecialchars($instance['data_to_use']);
     $paragraph      = htmlspecialchars($instance['paragraph']);
+    $posts_per_blog = htmlspecialchars($instance['posts_per_blog']);
     $length         = htmlspecialchars($instance['length']);
     $link           = htmlspecialchars($instance['link']);
     $link_to        = htmlspecialchars($instance['link_to']);

@@ -3,7 +3,7 @@
 /**
  * This is where all the queries are made
  */
-function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
+function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = FALSE) {
   global $wpdb;
   switch($type) {
 
@@ -97,6 +97,9 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1) {
           }
           $posts->blog_id = $blog;
           $data[] = $posts;
+        }
+        if($hard_limit && count($data) >= $limit) {
+          break;
         }
       }
       $wpdb = clone $wpdb_stash;
