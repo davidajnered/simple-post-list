@@ -128,6 +128,9 @@ class simple_post_list extends WP_Widget {
     $start = strpos($content, '<p>');
     $end = strpos($content, '</p>', $start);
     $paragraph = substr($content, $start, $end - $start + 4);
+    if($start == FALSE || $end == FALSE) {
+      $paragraph = $this->spl_shorten($content);
+    }
     return $paragraph;
   }
 
