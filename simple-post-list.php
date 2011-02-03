@@ -38,6 +38,8 @@ class simple_post_list extends WP_Widget {
       $link                 = $instance['link'];
       $template             = $instance['template'];
       $limit                = $instance['limit'];
+      $ignore               = $instance['ignore'];
+
       // Set default limit
       $limit = !is_int($limit) ? (int)$limit : $limit;
       $limit = $limit == 0 ? 1 : $limit;
@@ -47,7 +49,8 @@ class simple_post_list extends WP_Widget {
         $ex = explode(':', $selection);
         $type = $ex[0];
         $selection = $ex[1];
-        $data_array = spl_get_posts($selection, $limit, $posts_per_blog);
+        $ignore = explode(',', $ignore);
+        $data_array = spl_get_posts($selection, $limit, $posts_per_blog, $ignore);
         $inc = $template ? $template : WP_PLUGIN_DIR . '/simple-post-list/' . 'templates/spl_' . $type . '_default_template.php';
       }
       include('includes/output.php');
@@ -152,6 +155,7 @@ class simple_post_list extends WP_Widget {
     $instance['link']           = strip_tags(stripslashes($new_instance['link']));
     $instance['link_to']        = strip_tags(stripslashes($new_instance['link_to']));
     $instance['template']       = strip_tags(stripslashes($new_instance['template']));
+    $instance['ignore']        = strip_tags(stripslashes($new_instance['ignore']));
     return $instance;
   }
 
@@ -170,6 +174,7 @@ class simple_post_list extends WP_Widget {
     $length         = htmlspecialchars($instance['length']);
     $link           = htmlspecialchars($instance['link']);
     $link_to        = htmlspecialchars($instance['link_to']);
+    $ignore        = htmlspecialchars($instance['ignore']);
 
     $template_files = $this->spl_get_themes();
     /* Print interface */

@@ -3,7 +3,7 @@
 /**
  * This is where all the queries are made
  */
-function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = FALSE) {
+function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = FALSE, $ignore = NULL) {
   global $wpdb;
   switch($type) {
 
@@ -59,7 +59,7 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = 
     // Blogs
     case 'recent_post_from_other_blogs':
       $wpdb_stash = clone $wpdb;
-      foreach(spl_get_all_blogs() as $blog) {
+      foreach(spl_get_all_blogs($ignore) as $blog) {
         $wpdb->blogid = $blog;
         $wpdb->set_prefix( $wpdb->base_prefix );
         $post_data = $wpdb->get_results($wpdb->prepare(
@@ -117,9 +117,18 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = 
   return $data;
 }
 
-function spl_get_all_blogs() {
+function spl_get_all_blogs($ignore = NULL) {
   global $wpdb;
-  $query = "SELECT blog_id FROM $wpdb->blogs;";
+  $query = "SELECT blog_id FROM $wpdb->blogs";
+  if($ignore) {
+    $i = 0;
+    foreach($ignore as $ignored_blog_id) {
+      $query .= ($i == 0) ? " WHERE " : " AND ";
+      $query .= " blog_id != " . $ignored_blog_id;
+      $i++;
+    }
+  }
+  $query .= ";";
   foreach($wpdb->get_results($query) as $key => $value) {
     $blogs[] = $value->blog_id;
   }

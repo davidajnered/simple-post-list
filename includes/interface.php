@@ -31,7 +31,7 @@
     <input class="spl-limit-input" id="<?php echo $this->get_field_id('limit') ?>" name="<?php echo $this->get_field_name('limit'); ?>" type="text" value="<?php echo $limit; ?>"/>
 
     <span class="spl-limit-per-post">
-      <input id="<?php echo $this->get_field_id('posts_per_blog') ?>" class="spl-limit-checkbox" name="<?php echo $this->get_field_name('posts_per_blog'); ?>" type="checkbox" value="checked" <?php echo $posts_per_blog ? 'checked': ''; ?>>
+      <input id="<?php echo $this->get_field_id('posts_per_blog') ?>" class="spl-limit-checkbox" name="<?php echo $this->get_field_name('posts_per_blog'); ?>" type="checkbox" value="checked" <?php echo $posts_per_blog ? '' : 'checked'; ?>>
       Posts per blog
     </span>
 
@@ -62,8 +62,7 @@
       <p class="spl-thumbnail-dropdown-wrapper">
         <label for="<?php echo $this->get_field_name('thumbnail_size'); ?>"><?php echo __('Select thumbnail size:'); ?></label><br>
         <select name="<?php echo $this->get_field_name('thumbnail_size'); ?>" id="<?php echo $this->get_field_id('thumbnail_size'); ?>">
-        <?php include_once('db_queries.php');
-        if(spl_get_thumbnail_sizes() != NULL) :
+        <?php if(spl_get_thumbnail_sizes() != NULL) :
           foreach(spl_get_thumbnail_sizes() as $name => $desc) : ?>
             <option <?php echo ($name == $instance['thumbnail_size']) ? 'selected' : '' ?> value="<?php echo $name; ?>">
               <?php echo $desc; ?>
@@ -91,4 +90,11 @@
     </p>
   <?php endif; ?>
 
+  <?php if(WP_ALLOW_MULTISITE == TRUE) : ?>
+    <p>
+      <label for="<?php echo $this->get_field_name('ignore'); ?>"><?php echo __('Ignore blogs by id:'); ?></label><br>
+      <input id="<?php echo $this->get_field_id('ignore'); ?>" name="<?php echo $this->get_field_name('ignore'); ?>" type="text" value="<?php echo $ignore; ?>" />
+      <small>comma separate list of id's'</small>
+    </p>
+  <?php endif; ?>
 </div>
