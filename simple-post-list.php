@@ -147,7 +147,7 @@ class simple_post_list extends WP_Widget {
     $instance['thumbnail_size'] = strip_tags(stripslashes($new_instance['thumbnail_size']));
     $instance['data_to_use']    = strip_tags(stripslashes($new_instance['data_to_use']));
     $instance['paragraph']      = strip_tags(stripslashes($new_instance['paragraph'])) != 'checked' ? FALSE : TRUE;
-    $instance['posts_per_blog'] = strip_tags(stripslashes($new_instance['posts_per_blog'])) != 'checked' ? FALSE : TRUE;
+    $instance['posts_per_blog'] = strip_tags(stripslashes($new_instance['posts_per_blog'])) != 'checked' ? TRUE : FALSE;
     $instance['length']         = strip_tags(stripslashes($new_instance['length']));
     $instance['link']           = strip_tags(stripslashes($new_instance['link']));
     $instance['link_to']        = strip_tags(stripslashes($new_instance['link_to']));
