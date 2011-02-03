@@ -59,58 +59,59 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = 
     // Blogs
     case 'recent_post_from_other_blogs':
       $wpdb_stash = clone $wpdb;
-      foreach(spl_get_all_blogs($ignore) as $blog) {
-        $wpdb->blogid = $blog;
-        $wpdb->set_prefix( $wpdb->base_prefix );
-        $post_data = $wpdb->get_results($wpdb->prepare(
-          "SELECT {$wpdb->posts}.ID AS id, post_title AS title, post_content AS content, post_excerpt AS excerpt, post_date AS date, post_status, guid AS post_url, term_id, count(comment_post_ID) as comments, comment_date AS comment_date, display_name AS author
-           FROM {$wpdb->posts}
-           LEFT JOIN ({$wpdb->term_relationships}, {$wpdb->term_taxonomy}, {$wpdb->comments}, {$wpdb->users})
-           ON (
-             {$wpdb->term_relationships}.object_id = {$wpdb->posts}.ID AND
-             {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id AND
-             {$wpdb->comments}.comment_post_ID = {$wpdb->posts}.ID AND
-             {$wpdb->posts}.post_author = {$wpdb->users}.ID
-           )
-           WHERE post_type = 'post'
-           AND post_status = 'publish'
-           GROUP BY ID
-           ORDER BY post_date DESC
-           LIMIT $limit;"));
-        // Option table is different and needs a separate query
-        $fields = array('blogname', 'blogdescription', 'siteurl');
-        $query = "SELECT * FROM $wpdb->options WHERE ";
-        $i = 0;
-        foreach($fields as $field) {
-          $query .= ($i > 0) ? " OR " : "";
-          $query .= "option_name = '$field'";
-          $i++;
-        }
-        $query .= ";";
-        $blog_options = $wpdb->get_results($query);
-        // Store values
-        foreach($post_data as $posts) {
-          // Specify a query of add the fields you want to grab to the array in sanitize_option_data function call
-          $blog_data = sanitize_option_data($blog_options, $fields);
-          foreach($blog_data as $key => $value) {
-            $posts->$key = $value;
+      $blogs = spl_get_all_blogs($ignore);
+      if($blogs != NULL) {
+        foreach(spl_get_all_blogs($ignore) as $blog) {
+          $wpdb->blogid = $blog;
+          $wpdb->set_prefix( $wpdb->base_prefix );
+          $post_data = $wpdb->get_results($wpdb->prepare(
+            "SELECT {$wpdb->posts}.ID AS id, post_title AS title, post_content AS content, post_excerpt AS excerpt, post_date AS date, post_status, guid AS post_url, term_id, count(comment_post_ID) as comments, comment_date AS comment_date, display_name AS author
+             FROM {$wpdb->posts}
+             LEFT JOIN ({$wpdb->term_relationships}, {$wpdb->term_taxonomy}, {$wpdb->comments}, {$wpdb->users})
+             ON (
+               {$wpdb->term_relationships}.object_id = {$wpdb->posts}.ID AND
+               {$wpdb->term_relationships}.term_taxonomy_id = {$wpdb->term_taxonomy}.term_taxonomy_id AND
+               {$wpdb->comments}.comment_post_ID = {$wpdb->posts}.ID AND
+               {$wpdb->posts}.post_author = {$wpdb->users}.ID
+             )
+             WHERE post_type = 'post'
+             AND post_status = 'publish'
+             GROUP BY ID
+             ORDER BY post_date DESC
+             LIMIT $limit;"));
+          // Option table is different and needs a separate query
+          $fields = array('blogname', 'blogdescription', 'siteurl');
+          $query = "SELECT * FROM $wpdb->options WHERE ";
+          $i = 0;
+          foreach($fields as $field) {
+            $query .= ($i > 0) ? " OR " : "";
+            $query .= "option_name = '$field'";
+            $i++;
           }
-          $posts->blog_id = $blog;
-          $data[] = $posts;
+          $query .= ";";
+          $blog_options = $wpdb->get_results($query);
+          // Store values
+          foreach($post_data as $posts) {
+            // Specify a query of add the fields you want to grab to the array in sanitize_option_data function call
+            $blog_data = sanitize_option_data($blog_options, $fields);
+            foreach($blog_data as $key => $value) {
+              $posts->$key = $value;
+            }
+            $posts->blog_id = $blog;
+            $data[] = $posts;
+          }
+          if($hard_limit && count($data) >= $limit) {
+            break;
+          }
         }
-        if($hard_limit && count($data) >= $limit) {
-          break;
-        }
+      } else {
+        $data = NULL;
       }
       $wpdb = clone $wpdb_stash;
       break;
 
-    // Fallback. Creating custom error instead of generating a PHP error later on...
     default:
-      // Not tested so I'm not sure this works
-      $error = new stdClass;
-      $error->content = 'Error!';
-      $data = array(array($error));
+      $data = NULL;
       break;
 
   }
@@ -119,6 +120,7 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = 
 
 function spl_get_all_blogs($ignore = NULL) {
   global $wpdb;
+  $blogs = NULL;
   $query = "SELECT blog_id FROM $wpdb->blogs";
   if($ignore) {
     $i = 0;
