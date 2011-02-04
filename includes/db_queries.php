@@ -3,7 +3,7 @@
 /**
  * This is where all the queries are made
  */
-function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = FALSE, $ignore = NULL) {
+function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = FALSE) {
   global $wpdb;
   switch($type) {
 
@@ -61,7 +61,7 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = 
       $wpdb_stash = clone $wpdb;
       $blogs = spl_get_all_blogs($ignore);
       if($blogs != NULL) {
-        foreach(spl_get_all_blogs($ignore) as $blog) {
+        foreach($blogs as $blog) {
           $wpdb->blogid = $blog;
           $wpdb->set_prefix( $wpdb->base_prefix );
           $post_data = $wpdb->get_results($wpdb->prepare(
@@ -118,11 +118,16 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = 
   return $data;
 }
 
-function spl_get_all_blogs($ignore = NULL) {
+function spl_get_all_blogs() {
   global $wpdb;
+  global $ignore;
+  if(!is_array($ignore)) {
+    $ignore = explode(',', $ignore);
+    $ignore = $ignore[0] == '' ? FALSE : $ignore;
+  }
   $blogs = NULL;
   $query = "SELECT blog_id FROM $wpdb->blogs";
-  if($ignore) {
+  if($ignore != FALSE) {
     $i = 0;
     foreach($ignore as $ignored_blog_id) {
       $query .= ($i == 0) ? " WHERE " : " AND ";
@@ -220,11 +225,11 @@ function sanitize_option_data($data, $fields = NULL) {
 /**
  * Get a list of available thumbnail sizes
  */
-function spl_get_thumbnail_sizes() {
+function spl_get_thumbnail_sizes($ignore) {
   global $wpdb;
   $options = array();
   $wpdb_stash = clone $wpdb;
-  foreach(spl_get_all_blogs() as $blog) {
+  foreach(spl_get_all_blogs($ignore) as $blog) {
     $wpdb->blogid = $blog;
     $wpdb->set_prefix( $wpdb->base_prefix );
     $data = $wpdb->get_results($wpdb->prepare(

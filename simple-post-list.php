@@ -9,16 +9,36 @@
 
 class simple_post_list extends WP_Widget {
   private $length;
+  private $ignore;
 
   /**
   * Init method
   */
   function simple_post_list() {
-		$widget_ops = array('classname' => 'simple_post_list',
-                        'description' => __("Create a list with posts"));
-
+		$widget_ops = array(
+		  'classname' => 'simple_post_list',
+      'description' => __("Create a list with posts")
+    );
     $control_ops = array('width' => 100, 'height' => 100);
     $this->WP_Widget('simple_post_list', __('Simple Post List'), $widget_ops, $control_ops);
+  }
+
+  function fields() {
+    $fields = array(
+      'widget_title',
+      'length',
+      'selection',
+      'has_thumbnail',
+      'thumbnail_size',
+      'data_to_use',
+      'paragraph',
+      'posts_per_blog',
+      'link',
+      'template',
+      'limit',
+      'ignore',
+    );
+    return $fields;
   }
 
  /**
@@ -26,19 +46,10 @@ class simple_post_list extends WP_Widget {
   */
   function widget($args, $instance) {
     if(!empty($instance)) {
-      // Variables
-      $widget_title         = $instance['widget_title'];
-      $this->length         = (int)$instance['length'];
-      $selection            = $instance['selection'];
-      $has_thumbnail        = $instance['has_thumbnail'];
-      $thumbnail_size       = $instance['thumbnail_size'];
-      $data_to_use          = $instance['data_to_use'];
-      $paragraph            = $instance['paragraph'];
-      $posts_per_blog       = $instance['posts_per_blog'];
-      $link                 = $instance['link'];
-      $template             = $instance['template'];
-      $limit                = $instance['limit'];
-      $ignore               = $instance['ignore'];
+      foreach($this->fields() as $field) {
+        ${$field} = $instance[$field];
+      }
+      $this->length = (int)$length;
 
       // Set default limit
       $limit = !is_int($limit) ? (int)$limit : $limit;
@@ -49,8 +60,7 @@ class simple_post_list extends WP_Widget {
         $ex = explode(':', $selection);
         $type = $ex[0];
         $selection = $ex[1];
-        $ignore = explode(',', $ignore);
-        $data_array = spl_get_posts($selection, $limit, $posts_per_blog, $ignore);
+        $data_array = spl_get_posts($selection, $limit, $posts_per_blog);
         $inc = $template ? $template : WP_PLUGIN_DIR . '/simple-post-list/' . 'templates/spl_' . $type . '_default_template.php';
       }
       include('includes/output.php');
@@ -114,6 +124,7 @@ class simple_post_list extends WP_Widget {
    *
    */
   function spl_shorten($content) {
+    $content = strip_tags($content);
     if($this->length <= -1) {
       $content = '';
     }
@@ -135,7 +146,7 @@ class simple_post_list extends WP_Widget {
     if($start == FALSE || $end == FALSE) {
       $paragraph = $this->spl_shorten($content);
     }
-    return $paragraph;
+    return strip_tags($paragraph);
   }
 
  /**
@@ -143,19 +154,18 @@ class simple_post_list extends WP_Widget {
   */
   function update($new_instance, $old_instance) {
     $instance = $old_instance;
-    $instance['widget_title']   = strip_tags(stripslashes($new_instance['widget_title']));
-    $instance['selection']      = strip_tags(stripslashes($new_instance['selection']));
-    $instance['limit']          = strip_tags(stripslashes($new_instance['limit']));
-    $instance['has_thumbnail']  = strip_tags(stripslashes($new_instance['has_thumbnail'])) != 'checked' ? FALSE : TRUE;
-    $instance['thumbnail_size'] = strip_tags(stripslashes($new_instance['thumbnail_size']));
-    $instance['data_to_use']    = strip_tags(stripslashes($new_instance['data_to_use']));
-    $instance['paragraph']      = strip_tags(stripslashes($new_instance['paragraph'])) != 'checked' ? FALSE : TRUE;
-    $instance['posts_per_blog'] = strip_tags(stripslashes($new_instance['posts_per_blog'])) != 'checked' ? TRUE : FALSE;
-    $instance['length']         = strip_tags(stripslashes($new_instance['length']));
-    $instance['link']           = strip_tags(stripslashes($new_instance['link']));
-    $instance['link_to']        = strip_tags(stripslashes($new_instance['link_to']));
-    $instance['template']       = strip_tags(stripslashes($new_instance['template']));
-    $instance['ignore']        = strip_tags(stripslashes($new_instance['ignore']));
+    $special_fields = array('has_thumbnail', 'paragraph', 'posts_per_blog');
+    foreach($this->fields() as $field) {
+      $instance[$field] = strip_tags(stripslashes($new_instance[$field]));
+      if(in_array($field, $special_fields)) {
+        $instance[$field] = $instance[$field] != 'checked' ? FALSE : TRUE;
+      }
+    }
+
+    // Set global
+    $this->length         = (int)$length;
+    $this->ignore         = $ignore;
+
     return $instance;
   }
 
@@ -163,18 +173,9 @@ class simple_post_list extends WP_Widget {
   * GUI for backend
   */
   function form($instance) {
-    $widget_title   = htmlspecialchars($instance['widget_title']);
-    $selection      = htmlspecialchars($instance['selection']);
-    $limit          = htmlspecialchars($instance['limit']);
-    $has_thumbnail  = htmlspecialchars($instance['has_thumbnail']);
-    $thumbnail_size = htmlspecialchars($instance['thumbnail_size']);
-    $data_to_use    = htmlspecialchars($instance['data_to_use']);
-    $paragraph      = htmlspecialchars($instance['paragraph']);
-    $posts_per_blog = htmlspecialchars($instance['posts_per_blog']);
-    $length         = htmlspecialchars($instance['length']);
-    $link           = htmlspecialchars($instance['link']);
-    $link_to        = htmlspecialchars($instance['link_to']);
-    $ignore        = htmlspecialchars($instance['ignore']);
+    foreach($this->fields() as $field) {
+      ${$field} = htmlspecialchars($instance[$field]);
+    }
 
     $template_files = $this->spl_get_themes();
     /* Print interface */

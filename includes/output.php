@@ -11,12 +11,12 @@
             // we store old ones so we can restore them after the loop
             foreach($data as $key => $value) {
               $old_variables[$key] = ${$key};
+              // Format content and excerpt to the user specified length
               if($key == 'content' || $key == 'excerpt') {
                 if($paragraph) {
                   $value = $this->spl_paragraph($value);
-                  $value = strip_tags($value);
                 } else {
-                  $value = $this->spl_shorten(strip_tags($value));
+                  $value = $this->spl_shorten($value);
                 }
               }
               ${$key} = $value;
