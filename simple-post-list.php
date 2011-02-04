@@ -8,21 +8,28 @@
  */
 
 class simple_post_list extends WP_Widget {
+
   private $length;
   private $ignore;
 
-  /**
+ /**
   * Init method
   */
   function simple_post_list() {
-		$widget_ops = array(
-		  'classname' => 'simple_post_list',
+    $widget_ops = array(
+      'classname' => 'simple_post_list',
       'description' => __("Create a list with posts")
     );
     $control_ops = array('width' => 100, 'height' => 100);
     $this->WP_Widget('simple_post_list', __('Simple Post List'), $widget_ops, $control_ops);
   }
 
+ /**
+  * Settings function that sets all active fields used by the widget
+  *
+  * @return
+  *   array with all fields
+  */
   function fields() {
     $fields = array(
       'widget_title',
@@ -43,6 +50,8 @@ class simple_post_list extends WP_Widget {
 
  /**
   * Displays the widget
+  * @param $args
+  * @param $instance
   */
   function widget($args, $instance) {
     if(!empty($instance)) {
@@ -68,13 +77,16 @@ class simple_post_list extends WP_Widget {
   }
 
   /**
+   * Finds all available template files
    *
+   * @return
+   *   all available template files
    */
-  function spl_get_themes() {
+  function spl_get_template_files() {
     $path = ABSPATH . '/wp-content/themes/' . get_template();
     $template_files = array();
-  	if(is_dir($path)) {
-  	  if ($folder = opendir($path)) {
+    if(is_dir($path)) {
+      if ($folder = opendir($path)) {
         while(($file = readdir($folder)) !== FALSE) {
           if(strpos($file, 'spl_post_') !== FALSE ||
             strpos($file, 'spl_comment_') !== FALSE ||
@@ -89,39 +101,51 @@ class simple_post_list extends WP_Widget {
         }
       }
     }
-  	return $template_files;
+    return $template_files;
   }
 
   /**
+   * Reads the comments in the template file to get the template information
    *
+   * @param $file
+   *   An active template file
+   *
+   * @return
+   *   Array with template file information
    */
   function spl_fetch_template($file = NULL) {
-  	$default_headers = array(
-  		'Name'          => 'Style Name',
-  		'Class'         => 'Class',
-  		'Description'   => 'Description',
-  		'Version'       => 'Version',
-  		'Author'        => 'Author',
-  		'AuthorURI'     => 'Author URI',
-  	);
-  	$fp = fopen($file, 'r');
-  	$file_data = fread($fp, 8192);
-  	fclose($fp);
-  	
-  	foreach($default_headers as $field => $regex) {
-  		preg_match('/^[ \t\/*#]*' . preg_quote($regex, '/') . ':(.*)$/mi', $file_data, ${$field});
-  		if (!empty(${$field})) {
-  			${$field} = _cleanup_header_comment(${$field}[1]);
-  		} else {
-  			${$field} = '';
-			}
-  	}
-  	$file_data = compact(array_keys($default_headers));
-  	return $file_data;
+    $default_headers = array(
+      'Name'          => 'Style Name',
+      'Class'         => 'Class',
+      'Description'   => 'Description',
+      'Version'       => 'Version',
+      'Author'        => 'Author',
+      'AuthorURI'     => 'Author URI',
+    );
+    $fp = fopen($file, 'r');
+    $file_data = fread($fp, 8192);
+    fclose($fp);
+
+    foreach($default_headers as $field => $regex) {
+      preg_match('/^[ \t\/*#]*' . preg_quote($regex, '/') . ':(.*)$/mi', $file_data, ${$field});
+      if (!empty(${$field})) {
+        ${$field} = _cleanup_header_comment(${$field}[1]);
+      } else {
+        ${$field} = '';
+      }
+    }
+    $file_data = compact(array_keys($default_headers));
+    return $file_data;
   }
 
   /**
+   * Shortens the content or excerpt to the user specified length
    *
+   * @param $content
+   *   The post content or excerpt
+   *
+   * @return
+   *   Shorter content
    */
   function spl_shorten($content) {
     $content = strip_tags($content);
@@ -137,7 +161,14 @@ class simple_post_list extends WP_Widget {
   }
 
  /**
+  * Tries to find the first paragraph (<p>) of the post content or excerpt.
+  * If there are no <p>-tags if falls back on spl_shorten instead
   *
+  * @param $content
+  *   The post content or except
+  *
+  * @return
+  *   First paragraph if one exists, else whatever spl_shorten returns
   */
   function spl_paragraph($content) {
     $start = strpos($content, '<p>');
@@ -151,6 +182,9 @@ class simple_post_list extends WP_Widget {
 
  /**
   * Saves the widget settings
+  *
+  * @param $new_instance
+  * @param $old_instance
   */
   function update($new_instance, $old_instance) {
     $instance = $old_instance;
@@ -162,7 +196,7 @@ class simple_post_list extends WP_Widget {
       }
     }
 
-    // Set global
+    // Set global variables
     $this->length         = (int)$length;
     $this->ignore         = $ignore;
 
@@ -171,13 +205,15 @@ class simple_post_list extends WP_Widget {
 
  /**
   * GUI for backend
+  *
+  * @param $instance
   */
   function form($instance) {
     foreach($this->fields() as $field) {
       ${$field} = htmlspecialchars($instance[$field]);
     }
 
-    $template_files = $this->spl_get_themes();
+    $template_files = $this->spl_get_template_files();
     /* Print interface */
     include('includes/interface.php');
   }

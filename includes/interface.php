@@ -1,19 +1,27 @@
-<?php include_once('db_queries.php'); ?>
+<?php
+ /**
+  * TODO: This should probably be placed somewhere else.
+  */
+
+  include_once('db_queries.php');
+
+  $options[] = array('type' => 'post', 'value' => 'recent_updated_post', 'name' => 'Post: Latest updated');
+  $options[] = array('type' => 'post', 'value' => 'most_commented_post', 'name' => 'Post: Most commented');
+  $options[] = array('type' => 'post', 'value' => 'recent_commented_post', 'name' => 'Post: Latest commented');
+  $options[] = array('type' => 'comment', 'value' => 'recent_comments', 'name' => 'Comment: Recent comments');
+  if(WP_ALLOW_MULTISITE == TRUE) {
+    $options[] = array('type' => 'blog', 'value' => 'recent_post_from_other_blogs', 'name' => 'Blog: Lastest posts from all blogs');
+  }
+
+?>
+
+<?php /* End settings */ ?>
 
 <div class="simple-post-list">
   <p>
     <label for="<?php echo $this->get_field_name('widget_title'); ?>"><?php echo __('Title:') ?></label><br>
     <input id="<?php echo $this->get_field_id('widget_title') ?>" name="<?php echo $this->get_field_name('widget_title'); ?>" type="text" value="<?php echo $widget_title; ?>"/>
   </p>
-
-  <?php
-  $options[] = array('type' => 'post', 'value' => 'most_commented_post', 'name' => 'Post: Most commented');
-  $options[] = array('type' => 'post', 'value' => 'recent_commented_post', 'name' => 'Post: Latest commented');
-  $options[] = array('type' => 'post', 'value' => 'recent_updated_post', 'name' => 'Post: Latest updated');
-  $options[] = array('type' => 'comment', 'value' => 'recent_comments', 'name' => 'Comment: Latest comments');
-  if(WP_ALLOW_MULTISITE == TRUE) {
-    $options[] = array('type' => 'blog', 'value' => 'recent_post_from_other_blogs', 'name' => 'Blog: Last posts from site');
-  } ?>
 
   <p>
     <label for="<?php echo $this->get_field_name('selection'); ?>"><?php echo __('Select list:'); ?></label><br>
@@ -62,8 +70,8 @@
       <p class="spl-thumbnail-dropdown-wrapper">
         <label for="<?php echo $this->get_field_name('thumbnail_size'); ?>"><?php echo __('Select thumbnail size:'); ?></label><br>
         <select name="<?php echo $this->get_field_name('thumbnail_size'); ?>" id="<?php echo $this->get_field_id('thumbnail_size'); ?>">
-        <?php if(spl_get_thumbnail_sizes($ignore) != NULL) :
-          foreach(spl_get_thumbnail_sizes($ignore) as $name => $desc) : ?>
+        <?php if(spl_get_thumbnail_sizes() != NULL) :
+          foreach(spl_get_thumbnail_sizes() as $name => $desc) : ?>
             <option <?php echo ($name == $instance['thumbnail_size']) ? 'selected' : '' ?> value="<?php echo $name; ?>">
               <?php echo $desc; ?>
             </option>

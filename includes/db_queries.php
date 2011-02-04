@@ -1,7 +1,18 @@
 <?php
 
 /**
- * This is where all the queries are made
+ * This is where all post queries starts
+ *
+ * @param $type
+ *   (optional) the name of query to be made. These are specified in interface.php
+ *
+ * @param $limit
+ *   Number of posts to be returned
+ *
+ * @param $hard_limit
+ *   This is used by queries that affect more than one blog. It's used to determine if the limit should be
+ *   total or per blog, e.g. if $limit is one(1) and $hard_limit is TRUE the query will return one post. If hard_limit is FALSE
+ *   the query will return one(1) posts per blog.
  */
 function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = FALSE) {
   global $wpdb;
@@ -118,21 +129,24 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = 
   return $data;
 }
 
+/**
+ * Returns an array with all active blogs
+ *
+ * @return
+ *   An array with blog id's
+ */
 function spl_get_all_blogs() {
   global $wpdb;
-  global $ignore;
+  $ignore = $this->ignore;
   if(!is_array($ignore)) {
     $ignore = explode(',', $ignore);
     $ignore = $ignore[0] == '' ? FALSE : $ignore;
   }
   $blogs = NULL;
-  $query = "SELECT blog_id FROM $wpdb->blogs";
+  $query = "SELECT blog_id FROM $wpdb->blogs WHERE deleted = 0";
   if($ignore != FALSE) {
-    $i = 0;
     foreach($ignore as $ignored_blog_id) {
-      $query .= ($i == 0) ? " WHERE " : " AND ";
-      $query .= " blog_id != " . $ignored_blog_id;
-      $i++;
+      $query .= " AND blog_id != " . $ignored_blog_id;
     }
   }
   $query .= ";";
@@ -143,7 +157,10 @@ function spl_get_all_blogs() {
 }
 
 /**
+ * This function reduces redundant code
  *
+ * @param $type
+ *   The type of query to be made
  */
 function get_common_query($type) {
   global $wpdb;
@@ -192,6 +209,15 @@ function get_common_query($type) {
   return $select;
 }
 
+/**
+ * Returns tags for a specific post
+ *
+ * @param $id
+ *   The post id
+ *
+ * @return
+ *   The tags for the post
+ */
 function spl_get_tags($id) {
   global $wpdb;
   $query =
@@ -209,6 +235,15 @@ function spl_get_tags($id) {
 
 /**
  * The results from the option table is quite ugly and needs to be beatifulized
+ *
+ * @param $data
+ *   The ugly data object
+ *
+ * @param $fields
+ *   The fields to be sanitized and returned
+ *
+ * @return
+ *   An array with the sanitized fields
  */
 function sanitize_option_data($data, $fields = NULL) {
   $sanitized = array();
@@ -224,12 +259,15 @@ function sanitize_option_data($data, $fields = NULL) {
 
 /**
  * Get a list of available thumbnail sizes
+ *
+ * @return
+ *   An array with all available thumbnail sizes
  */
-function spl_get_thumbnail_sizes($ignore) {
+function spl_get_thumbnail_sizes() {
   global $wpdb;
   $options = array();
   $wpdb_stash = clone $wpdb;
-  foreach(spl_get_all_blogs($ignore) as $blog) {
+  foreach(spl_get_all_blogs() as $blog) {
     $wpdb->blogid = $blog;
     $wpdb->set_prefix( $wpdb->base_prefix );
     $data = $wpdb->get_results($wpdb->prepare(
