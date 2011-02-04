@@ -1,5 +1,12 @@
 <?php
 
+$ignored_blogs;
+
+function set_ignore($ignore) {
+  global $ignored_blogs;
+  $ignored_blogs = $ignore;
+}
+
 /**
  * This is where all post queries starts
  *
@@ -136,10 +143,9 @@ function spl_get_posts($type = 'recent_updated_post', $limit = 1, $hard_limit = 
  *   An array with blog id's
  */
 function spl_get_all_blogs() {
-  global $wpdb;
-  $ignore = $this->ignore;
-  if(!is_array($ignore)) {
-    $ignore = explode(',', $ignore);
+  global $wpdb, $ignored_blogs;
+  if(!is_array($ignored_blogs)) {
+    $ignore = explode(',', $ignored_blogs);
     $ignore = $ignore[0] == '' ? FALSE : $ignore;
   }
   $blogs = NULL;

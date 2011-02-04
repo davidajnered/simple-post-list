@@ -59,12 +59,14 @@ class simple_post_list extends WP_Widget {
         ${$field} = $instance[$field];
       }
       $this->length = (int)$length;
+      $this->ignore = $ignore;
 
       // Set default limit
       $limit = !is_int($limit) ? (int)$limit : $limit;
       $limit = $limit == 0 ? 1 : $limit;
 
       include_once('includes/db_queries.php');
+      set_ignore($ignore);
       if(!empty($selection)) {
         $ex = explode(':', $selection);
         $type = $ex[0];
