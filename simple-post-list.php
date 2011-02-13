@@ -72,7 +72,7 @@ class simple_post_list extends WP_Widget {
         $type = $ex[0];
         $selection = $ex[1];
         $data_array = spl_get_posts($selection, $limit, $posts_per_blog);
-        $inc = $template ? $template : WP_PLUGIN_DIR . '/simple-post-list/' . 'templates/spl_' . $type . '_default_template.php';
+        $inc = $template ? ABSPATH . $template : ABSPATH . '/plugins/simple-post-list/templates/spl_' . $type . '_default_template.php';
       }
       include('includes/output.php');
     }
@@ -85,7 +85,8 @@ class simple_post_list extends WP_Widget {
    *   all available template files
    */
   function spl_get_template_files() {
-    $path = ABSPATH . '/wp-content/themes/' . get_template();
+    $relpath = 'wp-content/themes/' . get_template();
+    $path = ABSPATH . $relpath;
     $template_files = array();
     if(is_dir($path)) {
       if ($folder = opendir($path)) {
@@ -93,7 +94,7 @@ class simple_post_list extends WP_Widget {
           if(strpos($file, 'spl_post_') !== FALSE ||
             strpos($file, 'spl_comment_') !== FALSE ||
             strpos($file, 'spl_blog_') !== FALSE) {
-            $file_path = $path . '/' . $file;
+            $file_path = $relpath . '/' . $file;
             $template = $this->spl_fetch_template($file_path);
             $template['Path'] = $file_path;
             if(!empty($template['Path']) && !empty($template['Name'])) {
@@ -124,7 +125,7 @@ class simple_post_list extends WP_Widget {
       'Author'        => 'Author',
       'AuthorURI'     => 'Author URI',
     );
-    $fp = fopen($file, 'r');
+    $fp = fopen(ABSPATH . $file, 'r');
     $file_data = fread($fp, 8192);
     fclose($fp);
 

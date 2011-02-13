@@ -102,7 +102,7 @@
     <p>
       <label for="<?php echo $this->get_field_name('ignore'); ?>"><?php echo __('Ignore blogs by id:'); ?></label><br>
       <input id="<?php echo $this->get_field_id('ignore'); ?>" name="<?php echo $this->get_field_name('ignore'); ?>" type="text" value="<?php echo $ignore; ?>" />
-      <small>comma separate list of id's'</small>
+      <small>comma separated list of id's'</small>
     </p>
   <?php endif; ?>
 </div>

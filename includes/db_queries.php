@@ -179,6 +179,7 @@ function get_common_query($type) {
           post_content AS content,
           post_excerpt AS except,
           guid AS post_url,
+          post_date,
           comment_count AS comments,
           comment_date AS comment_date,
           display_name AS author
@@ -293,6 +294,5 @@ function spl_get_thumbnail_sizes() {
       }
     }
   }
-  
   return $options;
 }
